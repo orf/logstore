@@ -1,0 +1,10 @@
+<form method="GET" action="{% url "search:dashboard" %}" id="search_bar_form">
+    <div class="row collapse">
+        <div class="small-11 columns">
+            <input name="query" id="search_query" type="text" placeholder="Enter search query" value="{{ query }}">
+        </div>
+        <div class="small-1 column">
+            <a onclick="$('#search_bar_form').submit()" class="button postfix"><i class="fi-magnifying-glass"></i></a>
+        </div>
+    </div>
+</form>

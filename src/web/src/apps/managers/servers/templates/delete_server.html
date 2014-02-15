@@ -1,0 +1,12 @@
+{% extends "servers_base.html" %}
+
+{% block content %}
+    <h3>Warning</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>Deleting server <a href="{% url "servers:view" object.id %}">{{ object }}</a> will also remove any associated logs.</p>
+        <p>Suspending the server will preserve the logs</p>
+        <input type="submit" class="button small alert" value="Confirm" />
+        <a class="button small success" href="{% url "servers:view" object.id %}">Cancel</a>
+    </form>
+{% endblock %}

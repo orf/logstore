@@ -1,0 +1,84 @@
+{% load staticfiles %}
+{% load activeurl %}
+{% load js %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	    <title>{{ page_title }} - LogBook</title>
+
+        {% include "includes/foundation_includes_head.html" %}
+    </head>
+
+    <body>
+        <div class="fixed">
+            <nav class="top-bar" data-topbar>
+                <ul class="title-area">
+                    <li class="name">
+                        <h1><a href="{% url "dashboard:dashboard" %}">LogBook</a></h1>
+                    </li>
+                </ul>
+
+                <section class="top-bar-section">
+                    <!-- Right Nav Section -->
+                    <ul class="right">
+                        <li class="divider"></li>
+                        <li class="has-dropdown">
+                            <a href="#">Logged in as [USER]</a>
+                            <ul class="dropdown">
+                                <li><a href="#">Some Link</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="left">
+                        <li class="divider"></li>
+                        <li class="has-dropdown">
+                            <a href="{% url "servers:list" %}">Servers</a>
+                            <ul class="dropdown">
+                                <li><a href="{% url "servers:create" %}">Add</a></li>
+                                <li class="divider"></li>
+                                {% for server in servers %}
+                                    <li><a href="{{ server.get_absolute_url }}">{{ server.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">Alerts</a></li>
+                    </ul>
+                </section>
+            </nav>
+        </div>
+
+        {% block content_override %}
+        <div class="row">
+            <div>
+                <div class="large-2 columns">
+                    &nbsp;
+                        {% block sidebar %}{% endblock %}
+                </div>
+            </div>
+
+
+            <div class="large-8 columns">
+                <div class="main_content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+
+            <div class="large-2 columns">&nbsp;</div>
+        </div>
+        {% endblock %}
+
+
+        {% block content_outside %}
+        {% endblock %}
+
+        {% include "includes/foundation_includes_tail.html" %}
+        {% django_js jquery=false %}
+        {% block tail_includes %}{% endblock %}
+    </body>
+</html>

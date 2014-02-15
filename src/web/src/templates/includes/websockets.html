@@ -1,0 +1,14 @@
+{% load staticfiles %}
+
+<script src="{% static "js/autobahn/autobahn.min.js" %}"></script>
+<script>
+    window.connectWebSocket = function(session_func){
+        var wsuri = "ws://localhost:6062";
+        ab.connect(wsuri, session_func,
+            // WAMP session is gone
+            function (code, reason) {
+               console.log(reason);
+            }
+       );
+    };
+</script>

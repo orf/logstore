@@ -1,0 +1,32 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="large-12 columns">
+            {% include "includes/search_bar.html" %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-3 medium-6 columns">
+            <div class="panel">
+                <h5>Messages Over Time</h5>
+            </div>
+        </div>
+
+        <div class="large-3 medium-6 columns">
+            <div class="panel">
+                <h5>Message Statistics</h5>
+            </div>
+        </div>
+
+        <div class="large-6 medium-12 columns">
+            <div class="panel">
+                <h5>Recent Events</h5>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "servers_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div id="installScriptModal" class="reveal-modal medium" data-reveal>
+        <h2>Re-install</h2>
+        <p>You can re-install the daemon by running the following command:</p>
+        <p><input type="text" value="curl {{ install_url }} | bash"/></p>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <div class="row">
+        <div class="large-12 columns">
+            {% include "includes/search_bar.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-6 medium-9 columns">
+            <p>Server Status: <span id="server_status"></span></p>
+        </div>
+        <div class="small-6 medium-3 columns">
+            <p class="right"><a data-reveal-id="installScriptModal">Get install code</a> </p>
+        </div>
+    </div>
+
+    {% with header_text="Live tail for server" %}
+        {% include "includes/live_tail/live_tail_content.html" %}
+    {% endwith %}
+{% endblock %}
+
+{% block tail_includes %}
+    <script>
+        window.gotServerLogline = function(event) {
+            return $("<div>").addClass("logentry").append(
+                            $("<span>").addClass("log_file").text(event.file + ":"),
+                            $("<span>").text("  "),
+                            $("<span>").addClass("log_date").text(new Date(event.time).toLocaleTimeString()),
+                            $("<span>").text("  "),
+                            $("<span>").addClass("log_message").text(event.line)
+                    );
+        };
+
+        $(document).ready(function(){
+            $.get(Django.url("api:is_server_online"),{server_id:{{ server_id }}}, function(data){
+                if (data == true){
+                    $("#server_status").text("connected")
+                } else if (data == false){
+                    $("#server_status").text("disconnected")
+                } else if (data == null){
+                    $("#server_status").text("Error")
+                }
+            })
+        })
+    </script>
+    {% include "includes/live_tail/live_tail_javascript.html" with log_line_function="gotServerLogline" %}
+{% endblock %}

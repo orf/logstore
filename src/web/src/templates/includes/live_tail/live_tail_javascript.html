@@ -1,0 +1,105 @@
+<script>
+    $("#live_button").click(function(){
+        var live_button = $("#live_button");
+
+        if (live_button.hasClass("alert")){
+            live_button.removeClass("alert").addClass("secondary")
+                    .children(".fa").removeClass("fa-play").addClass("fa-pause");
+            live_button.children(".live_text").text("Paused");
+        } else {
+            live_button.addClass("alert").removeClass("secondary")
+                    .children(".fa").removeClass("fa-pause").addClass("fa-play");
+            live_button.children(".live_text").text("Live");
+            window._logMessageBuffer.map(window.gotLogMessage);
+            window._logMessageBuffer = [];
+        }
+    });
+
+    $("#scroll_button").click(function(){
+        var scroll_button = $("#scroll_button");
+
+        if (scroll_button.hasClass("success")){
+            // We want to disable the scrolling. Add a secondary class to make it
+            // look disabled, then change the icon
+            scroll_button.removeClass("success").addClass("secondary")
+                    .children(".fa").removeClass("fa-play").addClass("fa-stop");
+        } else {
+            // Enable scrolling
+            scroll_button.addClass("success").removeClass("secondary")
+                    .children(".fa").removeClass("fa-stop").addClass("fa-play");
+
+            var tail_container = $(".tail_container");
+            tail_container.scrollTop(tail_container.prop("scrollHeight"));
+        }
+    });
+
+    $(".tail_container").on("click mousedown mouseup wheen mousewheel", function(e){
+        var scroll_button = $("#scroll_button");
+        if (scroll_button.hasClass("success")){
+            // Disable live scrolling
+            scroll_button.click();
+        }
+
+    });
+
+    window._logMessageBuffer = [];
+
+    window.gotLogMessage = function(event){
+        var live_button = $("#live_button");
+        if (!live_button.hasClass("alert")) {
+            // Disabled, buffer the message
+            window._logMessageBuffer.push(event);
+            live_button.children(".live_text").text("Paused: " + window._logMessageBuffer.length + " buffered");
+            return;
+        }
+
+        var log_line = {{ log_line_function }}(event);
+
+
+        $(".tail_inner").append(log_line);
+
+        if ($("#scroll_button").hasClass("success")){
+            /* Success class indicates we should scroll down */
+            var tail_container = $(".tail_container");
+            tail_container.scrollTop(tail_container.prop("scrollHeight"));
+        }
+    };
+
+    $(document).ready(function(){
+        $.getJSON("{{ object.get_last_messages_url }}", function(result){
+            $.each(result.reverse(), function(i, obj){
+                var res = obj._source;
+                window.gotLogMessage({
+                    line: res.message,
+                    time: res.read_time,
+                    server: res.server.name,
+                    file: res.file.name
+                })
+            });
+            window.connectWebSocket(function(session){
+                    // asynchronous RPC, returns promise object
+                    session.call("logbook/update#subscribe", "{{ object.get_search_query }}").then(
+
+                        // RPC success callback
+                        function (res) {
+                            session.subscribe("logbook/live/" + res, function(uri, event){
+                                if (window.gotLogMessage) {
+                                    window.gotLogMessage(event);
+                                } else {
+                                    console.log("Error: gotLogMessage is not defined!");
+                                }
+                            })
+                        },
+
+                        // RPC error callback
+                        function (error, desc) {
+                           console.log("error: " + desc);
+                        }
+                    );
+                }
+            );
+        });
+    });
+</script>
+
+{% include "includes/websockets.html" with session_func="got_session" %}

@@ -1,0 +1,76 @@
+{% extends "base_search.html" %}
+{% load staticfiles %}
+
+{% block tail_includes %}
+    {% include "includes/websockets.html" with session_func="got_session" %}
+    <script src="{% static "js/app/live_search.js" %}"></script>
+    <script src="{% static "js/mustache.js" %}"></script>
+    <script>
+        $(document).ready(function(){
+            $("html, body").animate({scrollTop: $(document).height()}, 1000)
+        })
+    </script>
+
+    {% verbatim %}
+    <script type="text/mustache" id="log_template">
+        {{#messages}}
+        <div class="row">
+            <div class="logentry">
+                <div class="xlarge-2 medium-3 small-4 columns">
+                    <div class="row">
+                        <div class="large-5 columns log_date">
+                                {{#date}}{{_source.read_time}}{{/date}}
+                        </div>
+                        <div class="large-7 columns log_file" style="white-space: nowrap;">
+                                {{_source.server.name}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xlarge-10 medium-9 small-8 columns">
+                    {{_source.message}}
+                </div>
+            </div>
+        </div>
+        {{/messages}}
+    </script>
+    {% endverbatim %}
+{% endblock %}
+
+{% block content_override %}
+    <div class="search_header_container">
+        <div class="row" id="header_row">
+            <div class="large-12 columns search_header_row">
+                {% include "includes/search_bar.html" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+                <div id="histogram_container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="search_content_container">
+        <div class="row">
+            <div class="medium-3 large-2 columns">
+                <div class="search_sidebar show-for-medium-up">
+                    <div class="panel">
+                        <h5>This is a regular panel.</h5>
+                        <p>Total: <span id="hits">0</span> results</p>
+                        <p>Took: <span id="took"></span>ms</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="medium-9 large-10 columns" id="search_results">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns" style="height: 30px">
+            &nbsp;
+        </div>
+    </div>
+{% endblock %}
