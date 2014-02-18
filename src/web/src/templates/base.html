@@ -11,6 +11,7 @@
 	    <title>{{ page_title }} - LogBook</title>
 
         {% include "includes/foundation_includes_head.html" %}
+        {% block extra_css %}{% endblock %}
     </head>
 
     <body>
@@ -36,16 +37,7 @@
 
                     <ul class="left">
                         <li class="divider"></li>
-                        <li class="has-dropdown">
-                            <a href="{% url "servers:list" %}">Servers</a>
-                            <ul class="dropdown">
-                                <li><a href="{% url "servers:create" %}">Add</a></li>
-                                <li class="divider"></li>
-                                {% for server in servers %}
-                                    <li><a href="{{ server.get_absolute_url }}">{{ server.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </li>
+                        <li><a href="{% url "servers:view" %}">Servers</a></li>
                         <li><a href="#">Events</a></li>
                         <li><a href="#">Alerts</a></li>
                     </ul>

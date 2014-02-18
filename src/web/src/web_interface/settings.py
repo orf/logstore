@@ -35,6 +35,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static_files"),
 )
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -46,12 +48,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'apps.dashboard',
-    'apps.managers.servers',
+    'apps.servers',
     'apps.search',
 
     'djangojs',
     'django.contrib.admin',
-    #'debug_toolbar',
+    'debug_toolbar',
     'template_timings_panel',
     'crispy_forms',
     'crispy_forms_foundation',
@@ -82,6 +84,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INTERNAL_IPS = ('127.0.0.1', '192.168.137.1')
+INTERCEPT_REDIRECTS = True
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.versions.VersionsPanel',

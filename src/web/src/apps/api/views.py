@@ -1,6 +1,6 @@
 from django.views.generic import View
 from django.http.response import HttpResponse
-from apps.managers.servers.models import Server
+#from apps.managers.servers.models import Server
 from pyelasticsearch import ElasticSearch
 from django.conf import settings
 from django.http.response import HttpResponseForbidden

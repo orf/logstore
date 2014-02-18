@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static "css/add_form.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="large-12 columns">
+            {% crispy form %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-6 columns">
+            <table class="expand">
+                <thead>
+                    <th width="250">Name</th>
+                    <th width="150">IP</th>
+                    <th width="50">Remove</th>
+                </thead>
+                <tbody>
+                {% for obj in object_list %}
+                    <tr>
+                        <td>{{ obj.name }}</td>
+                        <td>{{ obj.ip }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
