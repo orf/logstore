@@ -1,0 +1,11 @@
+.center_vertical {
+  vertical-align: middle;
+  display: table-cell;
+  margin: 0 0 12px 0; }
+
+.actions_column .delete_link {
+  color: red; }
+.actions_column .graphs_link {
+  color: green; }
+.actions_column form {
+  margin-bottom: 0px; }
