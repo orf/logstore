@@ -1,0 +1,56 @@
+@import "foundation/settings";
+
+.search_header_container {
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    z-index: 1;
+}
+
+.search_header_row {
+    padding-top:32px;
+}
+
+.search_content_container {
+    padding-top: 110px;
+    z-index: -100;
+}
+
+.search_content_container .search_sidebar {
+    position: fixed;
+    width: inherit;
+    padding-right: 40px;
+}
+
+.logentry {
+  font-family: 'Bitstream Vera Sans Mono', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 14px;
+  padding-left: 1.5em;
+  position: relative;
+
+  .log_file {
+    color: deepskyblue;
+  }
+
+  .log_date {
+    color: blue;
+  }
+
+  .log_message {
+    color: white;
+  }
+}
+
+#search_results{
+  width: 100%;
+
+  td:first-child{
+    width: 10%
+  }
+
+  td:nth-child(2){
+    width:10%
+  }
+}
+

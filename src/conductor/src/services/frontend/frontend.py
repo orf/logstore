@@ -15,20 +15,12 @@ class FrontendConnector(object):
 
     @defer.inlineCallbacks
     def check_ip(self, ip_address):
-        server_response = yield self._send_request("server_auth", {"ip": ip_address})
-        defer.returnValue(server_response.code == 200)
+        response = yield self._send_request("server_auth", {"ip": ip_address})
+        if response.code != 200:
+            defer.returnValue(False)
 
-    @defer.inlineCallbacks
-    def get_node_info(self, ip_address):
-        response = yield self._send_request("get_node_info", {"ip": ip_address})
         body = yield client.readBody(response)
-        defer.returnValue(json.loads(body))
-
-    @defer.inlineCallbacks
-    def get_log_files(self, node_id):
-        response = yield self._send_request("get_log_files", {"id": node_id})
-        body = yield client.readBody(response)
-        defer.returnValue(json.loads(body))
+        defer.returnValue(int(body))
 
     # Internal methods
     @defer.inlineCallbacks

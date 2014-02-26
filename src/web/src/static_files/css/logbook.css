@@ -28,26 +28,6 @@
     background: rgba(0, 64, 84, 0.05);
 }
 
-.logentry {
-    font-family: 'Bitstream Vera Sans Mono', 'Courier New', monospace;
-    font-size: 12px;
-    line-height: 14px;
-    padding-left: 1.5em;
-    position: relative;
-}
-
-.logentry .log_file {
-    color: deepskyblue;
-}
-
-.logentry .log_date {
-    color: gold;
-}
-
-.logentry .log_message {
-    color: white;
-}
-
 .tail_inner {
     cursor: text;
 }
@@ -62,24 +42,3 @@
     padding-bottom: 12px;
 }
 
-.search_header_container {
-    position: fixed;
-    width: 100%;
-    background-color: white;
-    z-index: 1;
-}
-
-.search_header_row {
-    padding-top:32px;
-}
-
-.search_content_container {
-    padding-top: 110px;
-    z-index: -100;
-}
-
-.search_content_container .search_sidebar {
-    position: fixed;
-    width: inherit;
-    padding-right: 40px;
-}

@@ -7,10 +7,10 @@ import json
 class ConductorServiceHandler(object):
     implements(ConductorService.Iface)
 
-    def __init__(self, node_info, factory):
-        self.node_info = node_info
+    def __init__(self, server_id, factory):
+        self.server_id = server_id
         self.factory = factory
-        log.msg("ConductorServiceHandler started for node %s" % node_info)
+        log.msg("ConductorServiceHandler started for server #%s" % server_id)
 
     def got_log_line(self, line):
         """
@@ -20,10 +20,12 @@ class ConductorServiceHandler(object):
             json.dumps(
                 {
                     "method": "ANALYZE",
-                    "server_info": {"id": self.node_info["id"], "name": self.node_info["name"]},
-                    "file_name": line.file_name,
-                    "read_time": line.read_time,
-                    "log_message": line.log_line
+                    "data": {
+                        "server_id": self.server_id,
+                        "file_name": line.file_name,
+                        "read_time": line.read_time,
+                        "log_message": line.log_line
+                    }
                 }
             )
         )

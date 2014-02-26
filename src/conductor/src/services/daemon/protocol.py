@@ -23,12 +23,12 @@ class AuthenticatingThriftProtocol(TTwisted.ThriftServerProtocol):
 
         self.transport.pauseProducing()
         try:
-            is_authenticated = yield self._authenticate(host)
+            self.server_id = yield self._authenticate(host)
         except Exception, e:
             log.err(_why="Error checking authentication status")
             is_authenticated = False
 
-        if is_authenticated:
+        if self.server_id:
             self.transport.resumeProducing()
             log.msg("Host is authenticated")
         else:
@@ -38,7 +38,6 @@ class AuthenticatingThriftProtocol(TTwisted.ThriftServerProtocol):
     def connectionLost(self, reason=None):
         log.msg("Lost connection: %s" % self.node_info)
 
-    @defer.inlineCallbacks
     def stringReceived(self, frame):
         # HACK HACK HACK HACK HACK
         # Getting at the transport inside a service handler is fucking impossible. So here we
@@ -52,19 +51,9 @@ class AuthenticatingThriftProtocol(TTwisted.ThriftServerProtocol):
         oprot = self.factory.oprot_factory.getProtocol(tmo)
 
         if self.processor is None:
-            self.transport.pauseProducing()
-
-            self.node_info = yield self.factory.frontend.get_node_info(self.transport.getPeer().host)
-
-            self.factory.websockets.notify_server_connected(self.node_info["token"],
-                                                            self.node_info["id"],
-                                                            self.transport.getPeer().host)
-
             self.processor = ConductorService.Processor(
-                ConductorServiceHandler(self.node_info, self.factory)
+                ConductorServiceHandler(self.server_id, self.factory)
             )
-
-            self.transport.resumeProducing()
 
         d = self.processor.process(iprot, oprot)
         d.addCallbacks(self.processOk, self.processError,

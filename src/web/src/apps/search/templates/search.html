@@ -1,38 +1,53 @@
 {% extends "base_search.html" %}
 {% load staticfiles %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static "css/search.css" %}">
+{% endblock %}
+
 {% block tail_includes %}
     {% include "includes/websockets.html" with session_func="got_session" %}
-    <script src="{% static "js/app/live_search.js" %}"></script>
-    <script src="{% static "js/mustache.js" %}"></script>
+    <script src="{% static "apps/search/js/search.js" %}"></script>
+    <script src="{% static "apps/search/js/doT.min.js" %}"></script>
+    <script src="{% static "apps/search/js/moment.min.js" %}"></script>
     <script>
-        $(document).ready(function(){
-            $("html, body").animate({scrollTop: $(document).height()}, 1000)
-        })
+        window.serverNames = {
+        {% for server in servers %}
+            {{ server.id }}:"{{ server.name }}",
+        {% endfor %}
+        }
     </script>
 
     {% verbatim %}
-    <script type="text/mustache" id="log_template">
-        {{#messages}}
-        <div class="row">
-            <div class="logentry">
-                <div class="xlarge-2 medium-3 small-4 columns">
-                    <div class="row">
-                        <div class="large-5 columns log_date">
-                                {{#date}}{{_source.read_time}}{{/date}}
-                        </div>
-                        <div class="large-7 columns log_file" style="white-space: nowrap;">
-                                {{_source.server.name}}
+    <script type="text/template" id="log_template">
+        {{ for(var item in it.messages) { }}
+            <tr>
+                <td>{{= moment(it.messages[item]._source.read_time).format("D/M/YY HH:mm:ss")}}</td>
+                <td>{{= it.getServerName(it.messages[item]._source.server_id) }}</td>
+                <td>{{= it.messages[item]._source.message}}</td>
+            </tr>
+
+            <!--<div class="row">
+                <div class="logentry">
+                    <div class="medium-3 columns">
+                        <div class="row">
+                            <div class="xlarge-6 columns log_date">
+
+                            </div>
+                            <div class="xlarge-6 columns log_file" style="white-space: nowrap;">
+
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="xlarge-10 medium-9 small-8 columns">
-                    {{_source.message}}
+                    <div class="medium-9 small-8 columns">
+
+                    </div>
                 </div>
-            </div>
-        </div>
-        {{/messages}}
+            </div>-->
+        {{ } }}
+
+
     </script>
     {% endverbatim %}
 {% endblock %}
@@ -42,11 +57,6 @@
         <div class="row" id="header_row">
             <div class="large-12 columns search_header_row">
                 {% include "includes/search_bar.html" %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
-                <div id="histogram_container"></div>
             </div>
         </div>
     </div>
@@ -63,7 +73,10 @@
                 </div>
             </div>
 
-            <div class="medium-9 large-10 columns" id="search_results">
+            <div class="medium-9 large-10 columns">
+                <table id="search_results" class="">
+
+                </table>
             </div>
         </div>
     </div>
