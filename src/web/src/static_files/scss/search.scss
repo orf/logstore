@@ -1,4 +1,4 @@
-@import "foundation/settings";
+@import "foundation/components/global";
 
 .search_header_container {
     position: fixed;
@@ -46,6 +46,9 @@
   width: 100%;
 
   td:first-child{
+    @media #{$small-only} {
+      width: 20%;
+    }
     width: 10%
   }
 
@@ -53,4 +56,3 @@
     width:10%
   }
 }
-
