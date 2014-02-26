@@ -15,5 +15,5 @@ service ConductorService {
 /* This internal service is only accessed by the web interface and the analyser */
 service InternalConductorService {
     // Notifies the conductor of a percolator(s) hit
-    oneway void percolator_hit(1:string logline, 2:string time, 3:string server_name, 4:string file_name, 5:set<string> hits)
+    oneway void percolator_hit(1:string logline, 2:string time, 3:i32 server_id, 4:string file_name, 5:set<string> hits)
 }

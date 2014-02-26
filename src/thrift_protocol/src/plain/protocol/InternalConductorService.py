@@ -18,12 +18,12 @@ except:
 
 
 class Iface(object):
-  def percolator_hit(self, logline, time, server_name, file_name, hits):
+  def percolator_hit(self, logline, time, server_id, file_name, hits):
     """
     Parameters:
      - logline
      - time
-     - server_name
+     - server_id
      - file_name
      - hits
     """
@@ -37,23 +37,23 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
-  def percolator_hit(self, logline, time, server_name, file_name, hits):
+  def percolator_hit(self, logline, time, server_id, file_name, hits):
     """
     Parameters:
      - logline
      - time
-     - server_name
+     - server_id
      - file_name
      - hits
     """
-    self.send_percolator_hit(logline, time, server_name, file_name, hits)
+    self.send_percolator_hit(logline, time, server_id, file_name, hits)
 
-  def send_percolator_hit(self, logline, time, server_name, file_name, hits):
+  def send_percolator_hit(self, logline, time, server_id, file_name, hits):
     self._oprot.writeMessageBegin('percolator_hit', TMessageType.CALL, self._seqid)
     args = percolator_hit_args()
     args.logline = logline
     args.time = time
-    args.server_name = server_name
+    args.server_id = server_id
     args.file_name = file_name
     args.hits = hits
     args.write(self._oprot)
@@ -85,7 +85,7 @@ class Processor(Iface, TProcessor):
     args = percolator_hit_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    self._handler.percolator_hit(args.logline, args.time, args.server_name, args.file_name, args.hits)
+    self._handler.percolator_hit(args.logline, args.time, args.server_id, args.file_name, args.hits)
     return
 
 
@@ -96,7 +96,7 @@ class percolator_hit_args(object):
   Attributes:
    - logline
    - time
-   - server_name
+   - server_id
    - file_name
    - hits
   """
@@ -104,7 +104,7 @@ class percolator_hit_args(object):
   __slots__ = [ 
     'logline',
     'time',
-    'server_name',
+    'server_id',
     'file_name',
     'hits',
    ]
@@ -113,15 +113,15 @@ class percolator_hit_args(object):
     None, # 0
     (1, TType.STRING, 'logline', None, None, ), # 1
     (2, TType.STRING, 'time', None, None, ), # 2
-    (3, TType.STRING, 'server_name', None, None, ), # 3
+    (3, TType.I32, 'server_id', None, None, ), # 3
     (4, TType.STRING, 'file_name', None, None, ), # 4
     (5, TType.SET, 'hits', (TType.STRING,None), None, ), # 5
   )
 
-  def __init__(self, logline=None, time=None, server_name=None, file_name=None, hits=None,):
+  def __init__(self, logline=None, time=None, server_id=None, file_name=None, hits=None,):
     self.logline = logline
     self.time = time
-    self.server_name = server_name
+    self.server_id = server_id
     self.file_name = file_name
     self.hits = hits
 
@@ -145,8 +145,8 @@ class percolator_hit_args(object):
         else:
           iprot.skip(ftype)
       elif fid == 3:
-        if ftype == TType.STRING:
-          self.server_name = iprot.readString().decode('utf-8')
+        if ftype == TType.I32:
+          self.server_id = iprot.readI32();
         else:
           iprot.skip(ftype)
       elif fid == 4:
@@ -182,9 +182,9 @@ class percolator_hit_args(object):
       oprot.writeFieldBegin('time', TType.STRING, 2)
       oprot.writeString(self.time.encode('utf-8'))
       oprot.writeFieldEnd()
-    if self.server_name is not None:
-      oprot.writeFieldBegin('server_name', TType.STRING, 3)
-      oprot.writeString(self.server_name.encode('utf-8'))
+    if self.server_id is not None:
+      oprot.writeFieldBegin('server_id', TType.I32, 3)
+      oprot.writeI32(self.server_id)
       oprot.writeFieldEnd()
     if self.file_name is not None:
       oprot.writeFieldBegin('file_name', TType.STRING, 4)

@@ -23,7 +23,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print 'Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] function [arg1 [arg2...]]'
   print ''
   print 'Functions:'
-  print '  void percolator_hit(string logline, string time, string server_name, string file_name,  hits)'
+  print '  void percolator_hit(string logline, string time, i32 server_id, string file_name,  hits)'
   print ''
   sys.exit(0)
 
@@ -79,7 +79,7 @@ if cmd == 'percolator_hit':
   if len(args) != 5:
     print 'percolator_hit requires 5 args'
     sys.exit(1)
-  pp.pprint(client.percolator_hit(args[0],args[1],args[2],args[3],eval(args[4]),))
+  pp.pprint(client.percolator_hit(args[0],args[1],eval(args[2]),args[3],eval(args[4]),))
 
 else:
   print 'Unrecognized method %s' % cmd
