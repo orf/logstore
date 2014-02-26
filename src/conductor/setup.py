@@ -23,4 +23,4 @@ try:
 except ImportError:
     pass
 else:
-    list(getPlugins(IPlugin))
+    list(getPlugins(IPlugin)) # Refresh the twisted plugin cache or something
