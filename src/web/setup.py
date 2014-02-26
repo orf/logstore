@@ -17,5 +17,5 @@ setup(name="logstore.web",
                         "crispy-forms-foundation",
                         "django-activeurl",
                         'django-model-utils',
-                        "pyelasticsearch",
+                        "elasticsearch",
                         "ipaddr"])

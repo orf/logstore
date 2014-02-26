@@ -1,6 +1,4 @@
 from django.views.generic import TemplateView
-from pyelasticsearch import ElasticSearch
-from django.conf import settings
 from ..servers.models import Server
 
 

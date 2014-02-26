@@ -50,9 +50,11 @@ class LiveUpdateFactory(WampServerFactory):
                 print "Removing percolator"
                 del self.percolators[query_hash]
 
+                # ToDo: Some kind of locking here
+
                 resp = yield web_agent.request(
                     "DELETE",
-                    "http://localhost:9200/_percolator/logs/%s" % query_hash,
+                    "http://localhost:9200/logs/.percolator/%s" % query_hash,
                     Headers(),
                     None
                 )
@@ -71,7 +73,7 @@ class LiveUpdateFactory(WampServerFactory):
             print "Creating percolator..."
             resp = yield web_agent.request(
                 "PUT",
-                "http://localhost:9200/_percolator/logs/%s" % hashlib.md5(query).hexdigest(),
+                "http://localhost:9200/logs/.percolator/%s" % hashlib.md5(query).hexdigest(),
                 Headers(),
                 StringProducer(json.dumps(
                     {
@@ -89,19 +91,18 @@ class LiveUpdateFactory(WampServerFactory):
         defer.returnValue(query_hash)
 
     @defer.inlineCallbacks
-    def got_percolator_hit(self, line, time, server_name, file_name, hashes):
+    def got_percolator_hit(self, line, time, server_id, file_name, hashes):
         for hash in (h for h in hashes if h in self.percolators):
             yield self.dispatch("logbook/live/%s" % hash,
                                 {
-                                    "line": line,
-                                    "time": time,
-                                    "server": server_name,
-                                    "file": file_name
+                                    "_source": {
+                                        "message": line,
+                                        "read_time": time,
+                                        "server_id": server_id,
+                                        "file_name": file_name
+                                    }
                                 })
 
     def notify_server_connected(self, token, server_id, server_ip):
         log.msg("Sending notification of server connection. Token: %s ID: %s IP: %s" % (token, server_id, server_ip))
         self.dispatch("logbook/live/install/%s" % token, {"id": server_id, "ip": server_ip})
-
-    #def onClientSubscribed(self, proto, topicUri):
-    #    print proto, topicUri

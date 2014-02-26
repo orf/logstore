@@ -1,6 +1,6 @@
 from django.views.generic import View
 from django.http.response import HttpResponse
-from pyelasticsearch import ElasticSearch
+from elasticsearch import Elasticsearch
 from django.conf import settings
 import json
 
@@ -9,9 +9,9 @@ from ..servers.models import Server
 
 class SearchLogsView(View):
     def get(self, *args, **kwargs):
-        es = ElasticSearch(settings.ELASTICSEARCH_URL)
+        es = Elasticsearch(settings.ELASTICSEARCH_URL)
         results = es.search(
-            {
+            body={
                 "query": {
                     "query_string": {
                         "query": self.request.GET["query"]
@@ -29,7 +29,7 @@ class SearchLogsView(View):
             index="logs",
             doc_type="line",
             size=self.request.GET.get("size", 25),
-            es_from=self.request.GET.get("from", 0)
+            from_=self.request.GET.get("from", 0)
         )
 
         return HttpResponse(json.dumps(results), status=200, content_type="text/json")

@@ -1,12 +1,8 @@
-{% extends "base_search.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static "css/search.css" %}">
-{% endblock %}
-
 {% block tail_includes %}
-    {% include "includes/websockets.html" with session_func="got_session" %}
+    <script src="{% static "js/autobahn/autobahn.min.js" %}"></script>
     <script src="{% static "apps/search/js/search.js" %}"></script>
     <script src="{% static "apps/search/js/doT.min.js" %}"></script>
     <script src="{% static "apps/search/js/moment.min.js" %}"></script>
@@ -20,15 +16,11 @@
 
     {% verbatim %}
     <script type="text/template" id="log_template">
-        {{ for(var item in it.messages) { }}
-            <tr>
-                <td>{{= moment(it.messages[item]._source.read_time).format("D/M/YY HH:mm:ss")}}</td>
-                <td>{{= it.getServerName(it.messages[item]._source.server_id) }}</td>
-                <td>{{= it.messages[item]._source.message}}</td>
-            </tr>
-        {{ } }}
-
-
+        <tr>
+            <td>{{= moment(it.item._source.read_time).format("D/M/YY HH:mm:ss")}}</td>
+            <td>{{= it.item._source.file_name }}@{{= it.getServerName(it.item._source.server_id) }}</td>
+            <td>{{= it.item._source.message}}</td>
+        </tr>
     </script>
     {% endverbatim %}
 {% endblock %}

@@ -1,4 +1,5 @@
 
+template_func = null;
 
 $(document).ready ->
   query = $("#search_query").val()
@@ -10,18 +11,42 @@ $(document).ready ->
       $("#hits").text data.hits.total
       $("#took").text data.took
 
-      $("#search_results").append(
-        template_func(
-          messages: data.hits.hits.reverse()
-          getServerName: getServerNameFromID
-          moment: moment
-        )
-      )
+      displaySearchResults(data.hits.hits.reverse())
 
-      $("html, body").animate({scrollTop: $(document).height()}, 1000)
+      $("html, body").animate({scrollTop: $(document).height()}, 0)
 
+  ab.connect("ws://localhost:6062",
+    gotWebSocketConnection(query),
+    (code, reason) -> console.log "Error connecting to WebSockets: " + reason
+  )
 
   null
+
+
+displaySearchResults = (results, inc_counter=false) ->
+  if inc_counter
+    $("#hits").text +$("#hits").text() + 1
+
+  for result in results
+    $("#search_results").append(
+          template_func(
+            item: result
+            getServerName: getServerNameFromID
+            moment: moment
+          )
+        )
+
+  $("html, body").animate({scrollTop: $(document).height()}, 0)
+
+
+gotWebSocketConnection = (query) ->
+  (session) ->
+    session.call "logbook/update#subscribe", query
+      .then (result) ->
+        # We have a successful RPC result, we should now subscribe to the returned channel ID
+        session.subscribe("logbook/live/" + result
+                          (uri, event) -> displaySearchResults([event], true)
+                          (error, desc) -> console.log "Error: " + error + " Desc: " + desc)
 
 
 getServerNameFromID = (id) ->
