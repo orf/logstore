@@ -6,10 +6,11 @@ import json
 
 from ..servers.models import Server
 
+es = Elasticsearch(settings.ELASTICSEARCH_URL)
 
 class SearchLogsView(View):
     def get(self, *args, **kwargs):
-        es = Elasticsearch(settings.ELASTICSEARCH_URL)
+
         results = es.search(
             body={
                 "query": {

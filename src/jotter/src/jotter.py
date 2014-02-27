@@ -14,7 +14,8 @@ import time
 class Options(usage.Options):
      optParameters = [
          ["master", "m", None],
-         ["name", "n", None]
+         ["name", "n", None],
+         ["file", "f", None]
      ]
 
 
@@ -35,6 +36,8 @@ class StandardInputForwarder(basic.LineReceiver):
     @defer.inlineCallbacks
     def flushQueue(self):
         if not self.queue:
+            if self.stdin_closed and not self._buffer:
+                reactor.stop()
             defer.returnValue(None)
 
         self.pauseProducing()
@@ -50,6 +53,7 @@ class StandardInputForwarder(basic.LineReceiver):
 
     @defer.inlineCallbacks
     def connectionMade(self):
+        print "Conn made"
         self.pauseProducing()
 
         conn = yield self.endpoint_deferred
@@ -59,22 +63,59 @@ class StandardInputForwarder(basic.LineReceiver):
         self.flush_queue_loop.start(1)
 
     def lineReceived(self, line):
-        self.queue.append(
-            LogLine(file_name=self.file_name,
-                    read_time=datetime.datetime.now().isoformat(),
-                    log_line=line)
-        )
-
-        if len(self.queue) == 100:
-            self.flushQueue()
+        if line:
+            self.queue.append(
+                LogLine(file_name=self.file_name,
+                        read_time=datetime.datetime.now().isoformat(),
+                        log_line=line)
+            )
 
     def readConnectionLost(self):
         print "stdin closed"
-        self.flushQueue()
-        if self.flush_queue_loop.running:
-            self.flush_queue_loop.stop()
         self.stdin_closed = True
         print time.time() - self.start_time
+
+
+class FileForwarder(object):
+    implements(interfaces.IConsumer)
+
+    def __init__(self, protocol):
+        self.protocol = protocol
+        self.producer = None
+        self.disconnecting = False
+
+    def registerProducer(self, producer, streaming):
+        self.producer = producer
+        self.producer.resumeProducing()
+
+    def unregisterProducer(self):
+        self.producer = None
+
+    def write(self, data):
+        self.protocol.dataReceived(data)
+
+
+class ConnectionFactory(TTwisted.ThriftClientFactory):
+
+    def clientConnectionLost(self, connector, reason):
+        print "Connection lost: %s" % reason
+
+    def clientConnectionFailed(self, connector, reason):
+        print "Failed"
+
+    def startedConnecting(self, connector):
+        print "Started connecting"
+
+
+@defer.inlineCallbacks
+def send_file(file_path, forwarder):
+    with open(file_path, "rb") as fd:
+        file_producer = basic.FileSender()
+        file_producer.disconnecting = False
+
+        forwarder.makeConnection(file_producer)
+        yield file_producer.beginFileTransfer(fd, FileForwarder(forwarder))
+        forwarder.readConnectionLost()
 
 
 def main():
@@ -87,16 +128,22 @@ def main():
         print "%s: Try --help for usage details" % sys.argv[0]
         sys.exit(1)
 
-    endpoint = endpoints.clientFromString(reactor, options["master"])
+    if options["file"] and not options["name"]:
+        import os
+        options["name"] = os.path.basename(options["file"])
 
-    stdio.StandardIO(
-        StandardInputForwarder(
-            endpoint.connect(TTwisted.ThriftClientFactory(
+    endpoint = endpoints.clientFromString(reactor, options["master"])
+    forwarder = StandardInputForwarder(
+        endpoint.connect(
+            ConnectionFactory(
                 ConductorService.Client, TBinaryProtocol.TBinaryProtocolFactory())
-            ),
-            options["name"]
+            ), options["name"]
         )
-    )
+
+    if options["file"]:
+        send_file(options["file"], forwarder)
+    else:
+        stdio.StandardIO(forwarder)
 
     reactor.run()
 

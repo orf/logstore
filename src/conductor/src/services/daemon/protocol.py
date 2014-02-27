@@ -1,42 +1,22 @@
 from thrift.transport import TTwisted, TTransport
-from twisted.internet import defer
 from .handler import ConductorServiceHandler
+from ...util.auth import AuthenticatingMixin
 from logstore.thrift_protocol.twisted.protocol import ConductorService
 from twisted.python import log
 
 
-class AuthenticatingThriftProtocol(TTwisted.ThriftServerProtocol):
-
+class AuthenticatingThriftProtocol(AuthenticatingMixin, TTwisted.ThriftServerProtocol):
     def __init__(self):
         self.processor = None
-        self.node_info = None
-
-    @defer.inlineCallbacks
-    def _authenticate(self, host):
-        is_auth = yield self.factory.frontend.check_ip(host.host)
-        defer.returnValue(is_auth)
-
-    @defer.inlineCallbacks
-    def connectionMade(self):
-        host = self.transport.getPeer()
-        log.msg("Checking host %s" % host)
-
-        self.transport.pauseProducing()
-        try:
-            self.server_id = yield self._authenticate(host)
-        except Exception, e:
-            log.err(_why="Error checking authentication status")
-            is_authenticated = False
-
-        if self.server_id:
-            self.transport.resumeProducing()
-            log.msg("Host is authenticated")
-        else:
-            self.transport.loseConnection()
-            log.msg("Host is not authenticated, connection dropped")
+        super(AuthenticatingThriftProtocol, self).__init__()
 
     def connectionLost(self, reason=None):
-        log.msg("Lost connection: %s" % self.node_info)
+        if self.server_id:
+            log.msg("Lost connection: %s" % self.server_id)
+            self.factory.remove_handler(self)
+
+    def auth_success(self, server_id):
+        self.factory.add_handler(self)
 
     def stringReceived(self, frame):
         # HACK HACK HACK HACK HACK

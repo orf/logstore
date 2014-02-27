@@ -83,6 +83,7 @@ def main():
                                       doc["server_id"],
                                       doc["file_name"],
                                       set((m["_id"] for m in percolate_result["matches"])))
+                sys.stdout.write("!")
             sys.stdout.write(".")
 
         # Acknowledge the message

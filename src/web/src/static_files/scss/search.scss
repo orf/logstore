@@ -42,17 +42,20 @@
   }
 }
 
-#search_results{
-  width: 100%;
+.log_entry {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  line-height: 16px;
 
-  td:first-child{
-    @media #{$small-only} {
-      width: 20%;
-    }
-    width: 10%
+  .server_info {
+    color: #1f77b4;
   }
 
-  td:nth-child(2){
-    width:10%
+  .file_info {
+    color: #aec7e8
+  }
+
+  span {
+    font-family: Courier,sans-serif
   }
 }

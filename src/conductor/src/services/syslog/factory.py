@@ -4,3 +4,6 @@ from .protocol import SysLogProtocol
 
 class SysLogFactory(ServerFactory):
     protocol = SysLogProtocol
+
+    def __init__(self, frontend):
+        self.frontend = frontend

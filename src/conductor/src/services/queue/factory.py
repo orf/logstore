@@ -5,6 +5,7 @@ import pika
 
 
 class RabbitMQConnectionFactory(ReconnectingClientFactory):
+    maxDelay = 60
     protocol = RabbitMQConnectionProtocol
 
     def __init__(self):

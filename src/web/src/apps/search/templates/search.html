@@ -16,11 +16,14 @@
 
     {% verbatim %}
     <script type="text/template" id="log_template">
-        <tr>
-            <td>{{= moment(it.item._source.read_time).format("D/M/YY HH:mm:ss")}}</td>
-            <td>{{= it.item._source.file_name }}@{{= it.getServerName(it.item._source.server_id) }}</td>
-            <td>{{= it.item._source.message}}</td>
-        </tr>
+        <p class="log_entry">
+            <!--<span class="time_info">
+                {{= moment(it.item._source.read_time).format("D/M/YY")}} {{= moment(it.item._source.read_time).format("HH:mm:ss")}}
+            </span>-->
+            <span class="file_info">{{= it.item._source.file_name }}</span>
+            <span class="server_info">{{= it.getServerName(it.item._source.server_id) }}</span>
+            <span>{{= it.item._source.message}}</span>
+        </p>
     </script>
     {% endverbatim %}
 {% endblock %}
@@ -46,10 +49,8 @@
                 </div>
             </div>
 
-            <div class="medium-9 large-10 columns">
-                <table id="search_results" class="">
+            <div class="medium-9 large-10 columns" id="search_results">
 
-                </table>
             </div>
         </div>
     </div>

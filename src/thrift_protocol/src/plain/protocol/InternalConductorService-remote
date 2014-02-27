@@ -23,6 +23,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print 'Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] function [arg1 [arg2...]]'
   print ''
   print 'Functions:'
+  print '  bool remove_server(i32 server_id)'
   print '  void percolator_hit(string logline, string time, i32 server_id, string file_name,  hits)'
   print ''
   sys.exit(0)
@@ -75,7 +76,13 @@ protocol = TBinaryProtocol.TBinaryProtocol(transport)
 client = InternalConductorService.Client(protocol)
 transport.open()
 
-if cmd == 'percolator_hit':
+if cmd == 'remove_server':
+  if len(args) != 1:
+    print 'remove_server requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.remove_server(eval(args[0]),))
+
+elif cmd == 'percolator_hit':
   if len(args) != 5:
     print 'percolator_hit requires 5 args'
     sys.exit(1)

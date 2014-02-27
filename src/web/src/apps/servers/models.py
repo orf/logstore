@@ -1,6 +1,9 @@
+
 from django.db import models
 from model_utils.fields import MonitorField
+
 import datetime
+
 
 
 class Server(models.Model):
@@ -9,3 +12,5 @@ class Server(models.Model):
 
     total_lines = models.BigIntegerField(default=0)
     total_lines_changed = MonitorField(monitor="total_lines", default=lambda: datetime.datetime.now())
+
+

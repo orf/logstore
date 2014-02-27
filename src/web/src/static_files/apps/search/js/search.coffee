@@ -13,7 +13,7 @@ $(document).ready ->
 
       displaySearchResults(data.hits.hits.reverse())
 
-      $("html, body").animate({scrollTop: $(document).height()}, 0)
+      #$("html, body").animate({scrollTop: $(document).height()}, 0)
 
   ab.connect("ws://localhost:6062",
     gotWebSocketConnection(query),
@@ -22,6 +22,7 @@ $(document).ready ->
 
   null
 
+node = document.getElementById("search_results")
 
 displaySearchResults = (results, inc_counter=false) ->
   if inc_counter
@@ -36,7 +37,13 @@ displaySearchResults = (results, inc_counter=false) ->
           )
         )
 
-  $("html, body").animate({scrollTop: $(document).height()}, 0)
+  child_count = document.querySelectorAll("#search_results > p").length
+
+  if child_count > 500
+    if results.length == 1
+      node.removeChild(node.children[0])
+
+  #$("html, body").animate({scrollTop: $(document).height()}, 0)
 
 
 gotWebSocketConnection = (query) ->
@@ -50,7 +57,6 @@ gotWebSocketConnection = (query) ->
 
 
 getServerNameFromID = (id) ->
-  console.log id
   window.serverNames[id]
 
 

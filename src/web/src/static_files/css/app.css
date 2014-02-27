@@ -8814,22 +8814,22 @@ th.hide-for-touch {
 }
 
 /* line 45, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
-#search_results {
-  width: 100%;
+.log_entry {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  line-height: 16px;
 }
-/* line 48, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
-#search_results td:first-child {
-  width: 10%;
+/* line 50, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
+.log_entry .server_info {
+  color: #1f77b4;
 }
-@media only screen and (max-width: 40em) {
-  /* line 48, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
-  #search_results td:first-child {
-    width: 20%;
-  }
+/* line 54, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
+.log_entry .file_info {
+  color: #aec7e8;
 }
-/* line 55, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
-#search_results td:nth-child(2) {
-  width: 10%;
+/* line 58, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/search.scss */
+.log_entry span {
+  font-family: Courier, sans-serif;
 }
 
 /* line 1, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/forms/add_server_form.scss */
