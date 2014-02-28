@@ -2,6 +2,8 @@ from twisted.protocols.basic import LineReceiver
 from ...util.auth import AuthenticatingMixin
 import re
 import math
+import json
+import datetime
 
 severity = ('emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug')
 facility = ('kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news',
@@ -21,6 +23,20 @@ class SysLogProtocol(AuthenticatingMixin, LineReceiver):
     def lineReceived(self, line):
         line = line.strip()
         print self._calc_lvl(line), line
+
+        self.factory.queue.queue_message(
+            json.dumps(
+                {
+                    "method": "ANALYZE",
+                    "data": {
+                        "server_id": self.server_id,
+                        "file_name": "syslog",
+                        "read_time": datetime.datetime.now().isoformat(),
+                        "log_message": line
+                    }
+                }
+            )
+        )
 
     def _calc_lvl(self, line):
         lvl = fs_match.split(line)
