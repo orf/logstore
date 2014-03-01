@@ -1,0 +1,49 @@
+{% extends "format_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block format_content %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="panel">
+                <strong>Splitter:</strong>
+                {% if format.splitter %}
+                    <a href="{% url "formats:edit_splitter" format.id %}">
+                        {{ format.splitter.get_type_display }}
+                        {% if format.splitter.args %}({{ format.splitter.args }}){% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url "formats:edit_splitter" format.id %}">Define a splitter</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="200">Name</th>
+                        <th width="200">Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in format.fields.all %}
+                        <tr>
+                            <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
+                            <td>{{ field.get_type_display }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% endblock %}

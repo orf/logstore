@@ -19,7 +19,10 @@ class Format(object):
         self.tokens = self.separator.separate(message)
 
 
-class Separator(object):
+class Splitter(object):
+    def __init__(self, _):
+        pass
+
     def separate(self, message):
         raise NotImplementedError()
 

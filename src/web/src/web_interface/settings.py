@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'apps.dashboard',
     'apps.servers',
     'apps.search',
+    'apps.formats',
 
     'djangojs',
     'django.contrib.admin',
@@ -112,8 +113,10 @@ WSGI_APPLICATION = 'web_interface.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'logstore',
+        'USER': 'logstore',
+        'PASSWORD': 'password'
     }
 }
 

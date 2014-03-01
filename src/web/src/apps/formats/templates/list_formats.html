@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load staticfiles %}
 
 {% block tail_includes %}
     <script>
@@ -23,18 +24,22 @@
             <table class="expand">
                 <thead>
                     <th width="250">Name</th>
-                    <th width="150">IP</th>
+                    <th width="150">Files</th>
                     <th></th>
                 </thead>
                 <tbody>
                 {% for obj in object_list %}
                     <tr>
                         <td>{{ obj.name }}</td>
-                        <td>{{ obj.ip }}</td>
+                        <td>
+                            {% for file in obj.files %}
+                                {{ file }}<br/>
+                            {% endfor %}
+                        </td>
                         <td class="actions_column">
                             <div class="row collapse">
                                 <div class="large-12 columns">
-                                    <form method="POST" action="{% url "servers:delete" obj.id %}">
+                                    <form method="POST" action="{% url "formats:delete" obj.id %}">
                                         {% csrf_token %}
                                         <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
                                     </form>
@@ -43,7 +48,7 @@
                             </div>
                             <div class="row collapse">
                                 <div class="large-12 columns">
-                                    <a href="#" class="graphs_link"><i class="fi-graph-trend"></i> Graphs</a>
+                                    <a href="{% url "formats:edit" obj.id %}" class="graphs_link"><i class="fi-wrench"></i> Edit</a>
                                 </div>
                             </div>
                         </td>
