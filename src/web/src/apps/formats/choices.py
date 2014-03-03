@@ -11,7 +11,8 @@ class SplitterChoice(Choice):
 class TypeChoice(Choice):
     INTEGER = 1
     DATETIME = 2
+    IP_ADDRESS = 3, "IP Address"
 
 
 class TransformChoice(Choice):
-    SPLIT = 1
+    STRIP = 1

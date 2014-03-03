@@ -1,8 +1,8 @@
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django.views.generic.base import ContextMixin
+from django.core.urlresolvers import reverse_lazy
 from .models import Format, Splitter, Field, Transform
 from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm
-from django.core.urlresolvers import reverse_lazy
 
 
 class FormatMixin(ContextMixin):
@@ -41,6 +41,17 @@ class FormatDeleteView(DeleteView):
 class FormatDetailView(DetailView):
     model = Format
     template_name = "edit_format.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super(FormatDetailView, self).get_context_data(**kwargs)
+        if self.request.GET.get("test", None):
+            msg = self.request.GET["test"]
+            extractor = self.get_object().create_format()
+            ctx["test_data"] = extractor.process(msg)
+            ctx["test_message"] = msg
+            ctx["test_split_data"] = extractor.splitter.split(msg)
+
+        return ctx
 
 
 class SplitterView(FormatMixin, UpdateView):

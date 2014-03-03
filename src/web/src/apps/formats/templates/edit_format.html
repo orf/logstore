@@ -19,12 +19,13 @@
     </div>
 
     <div class="row">
-        <div class="small-12 columns">
+        <div class="small-6 columns">
             <table>
                 <thead>
                     <tr>
                         <th width="200">Name</th>
-                        <th width="200">Type</th>
+                        <th width="150">Type</th>
+                        <th width="100">Source</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,16 +33,71 @@
                         <tr>
                             <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
                             <td>{{ field.get_type_display }}</td>
+                            <td>{{ field.source_index }}</td>
                         </tr>
                     {% endfor %}
 
                     <tr>
-                        <td colspan="2" class="text-center">
+                        <td colspan="3" class="text-center">
                             <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="small-5 columns end">
+            <form method="GET" action="">
+                <div class="row">
+                    <div class="row collapse">
+                        <div class="small-11 columns">
+                            <input type="text" name="test" placeholder="Enter Test Data" value="{{ test_message }}">
+                        </div>
+                        <div class="small-1 columns">
+                            <button class="button postfix">Go</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <table>
+                        <thead>
+                            {% for index in test_split_data %}
+                                <th>{{ forloop.counter0 }}</th>
+                            {% endfor %}
+                        </thead>
+                        <tbody>
+                                <tr>
+                                    {% for item in test_split_data %}
+                                    <td>{{ item }}</td>
+                                    {% endfor %}
+                                </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <table>
+                        <thead>
+                            <th width="200">Name</th>
+                            <th width="200">Value</th>
+                        </thead>
+                        <tbody>
+                            {% for key, value in test_data.items %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 

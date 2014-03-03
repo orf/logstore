@@ -10,7 +10,7 @@ class AddFormatForm(forms.ModelForm):
     helper.form_method = "POST"
     helper.layout = Layout(
         Fieldset(
-            'Add a server',
+            'Add a format',
             Row(
                 Column('name', css_class='small-9'),
                 Column(HTML("<label>&nbsp;</label>"), Submit('submit', 'Submit', css_class="tiny"), css_class='small-3')
