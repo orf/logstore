@@ -1,7 +1,7 @@
 from .base import Transformer
 
 
-class StipTransformer(Transformer):
+class StripTransformer(Transformer):
     def __init__(self, characters):
         self.characters = characters
 

@@ -9,4 +9,4 @@ setup(name="logstore.extractor",
       package_dir = {'logstore.extractor': 'src'},
       namespace_packages =["logstore"],
       packages=["logstore.extractor"] + ["logstore.extractor." + p for p in find_packages("src")],
-      install_requires=[])
+      install_requires=["nose"])
