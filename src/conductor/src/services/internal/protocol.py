@@ -1,6 +1,7 @@
 from thrift.transport import TTwisted, TTransport
-from .handler import InternalServiceHandler
 from logstore.thrift_protocol.twisted.protocol import InternalConductorService
+
+from .handler import InternalServiceHandler
 
 
 class InternalServiceProtocol(TTwisted.ThriftServerProtocol):

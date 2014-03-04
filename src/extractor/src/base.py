@@ -30,11 +30,19 @@ class Splitter(object):
         raise NotImplementedError()
 
 
+class CharSplitter(Splitter):
+    char = None
+
+    def split(self, message):
+        return message.split(self.char)
+
+
 class Field(object):
-    def __init__(self, name, source, transformers):
+    def __init__(self, name, source, transformers, type=None):
         self.name = name
         self.source = source
         self.transformers = transformers
+        self.type = type
 
     def process(self, tokens):
         token = self.source.get_token(tokens)
@@ -42,7 +50,7 @@ class Field(object):
         for transformer in self.transformers:
             token = transformer.transform(token)
 
-        return {self.name: token}
+        return {self.name: self.type(token) if self.type else token}
 
 
 class FieldSource(object):

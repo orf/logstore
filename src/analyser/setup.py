@@ -9,7 +9,7 @@ setup(name="logstore.analyser",
       package_dir = {'logstore.analyser': 'src'},
       namespace_packages =["logstore"],
       packages=["logstore.analyser"] + ["logstore.analyser." + p for p in find_packages("src")],
-      install_requires=["elasticsearch"],
+      install_requires=["elasticsearch", "requests"],
       entry_points={
           "console_scripts": [
               "logstore_analyser = logstore.analyser.analyser:main"

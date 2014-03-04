@@ -1,3 +1,7 @@
+import sys
+import datetime
+import time
+
 from logstore.thrift_protocol.twisted.protocol import ConductorService
 from logstore.thrift_protocol.twisted.protocol.ttypes import LogLine
 from twisted.internet import endpoints, stdio, reactor, defer, interfaces, task
@@ -6,9 +10,6 @@ from twisted.protocols import basic
 from thrift.transport import TTwisted
 from thrift.protocol import TBinaryProtocol
 from zope.interface import implements
-import sys
-import datetime
-import time
 
 
 class Options(usage.Options):
@@ -21,7 +22,6 @@ class Options(usage.Options):
 
 class StandardInputForwarder(basic.LineReceiver):
     implements(interfaces.IHalfCloseableProtocol)
-    from os import linesep as delimiter
 
     def __init__(self, endpoint_deferred, file_name):
         self.endpoint_deferred = endpoint_deferred

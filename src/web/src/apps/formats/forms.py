@@ -1,7 +1,8 @@
 from django import forms
-from .models import Format, Splitter, Field, Transform
 from crispy_forms.helper import FormHelper
 from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, Submit, ButtonHolder
+
+from .models import Format, Splitter, Field, Transform
 
 
 class AddFormatForm(forms.ModelForm):
@@ -84,3 +85,22 @@ class TransformForm(forms.ModelForm):
     class Meta:
         model = Transform
         fields = ("type", "args")
+
+
+class FormatFilesForm(forms.Form):
+    files = forms.CharField(max_length=1024)
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.form_method = "POST"
+        self.helper.layout = Layout(
+            Fieldset(
+                'Edit Files',
+                "files"
+            ),
+            ButtonHolder(Submit('submit', 'Submit', css_class="small"))
+        )
+
+        if "instance" in kwargs and kwargs["instance"] is not None:
+            self.helper.layout.fields[0].legend = "Modify Transformation"
+        super(FormatFilesForm, self).__init__(*args, **kwargs)

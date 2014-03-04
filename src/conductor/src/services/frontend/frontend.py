@@ -1,8 +1,8 @@
+import urllib
+
 from twisted.internet import defer, reactor
 from twisted.web import client
 from twisted.web.client import HTTPConnectionPool
-import urllib
-import json
 
 
 pool = HTTPConnectionPool(reactor, persistent=True)
@@ -21,6 +21,16 @@ class FrontendConnector(object):
 
         body = yield client.readBody(response)
         defer.returnValue(int(body))
+
+    @defer.inlineCallbacks
+    def got_percolator_hit(self, logline, time, server_name, file_name, hit, search_id):
+        response = yield self._send_request("got_event_hit", {"logline": logline,
+                                                              "time": time,
+                                                              "server_name": server_name,
+                                                              "file_name": file_name,
+                                                              "hit": hit,
+                                                              "search_id": search_id})
+
 
     # Internal methods
     @defer.inlineCallbacks

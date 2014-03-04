@@ -1,15 +1,17 @@
-from .base import Splitter
 import shlex
 import re
 
+from .base import Splitter, CharSplitter
 
-class Character(Splitter):
+
+class Character(CharSplitter):
     def __init__(self, char):
         self.char = char
         super(Character, self).__init__(char)
 
-    def split(self, message):
-        return message.split(self.char)
+
+class Space(CharSplitter):
+    char = " "
 
 
 class Shlex(Splitter):

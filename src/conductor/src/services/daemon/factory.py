@@ -1,6 +1,9 @@
-from thrift.transport import TTwisted
-from .protocol import AuthenticatingThriftProtocol
 from collections import namedtuple, defaultdict
+
+from thrift.transport import TTwisted
+
+from .protocol import AuthenticatingThriftProtocol
+
 
 ClientReference = namedtuple("ClientReference", "name instance")
 

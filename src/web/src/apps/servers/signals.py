@@ -1,14 +1,16 @@
+import time
+
 from logstore.thrift_protocol.plain.protocol import InternalConductorService
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from elasticsearch import Elasticsearch
 from django.conf import settings
-from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
+
 from .models import Server
-import time
+
 
 es = Elasticsearch(settings.ELASTICSEARCH_URL)
 

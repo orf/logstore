@@ -1,0 +1,15 @@
+{% extends "format_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block format_content %}
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="breadcrumbs">
+              <li><a href="{% url "formats:edit" format.id %}">{{ format.name }}</a></li>
+              <li class="current">Modify Files</li>
+            </ul>
+        </div>
+    </div>
+
+    {% crispy form %}
+{% endblock %}

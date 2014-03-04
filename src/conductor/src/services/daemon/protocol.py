@@ -1,8 +1,9 @@
 from thrift.transport import TTwisted, TTransport
-from .handler import ConductorServiceHandler
-from ...util.auth import AuthenticatingMixin
 from logstore.thrift_protocol.twisted.protocol import ConductorService
 from twisted.python import log
+
+from .handler import ConductorServiceHandler
+from ...util.auth import AuthenticatingMixin
 
 
 class AuthenticatingThriftProtocol(AuthenticatingMixin, TTwisted.ThriftServerProtocol):

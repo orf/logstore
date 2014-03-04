@@ -1,16 +1,42 @@
+import json
+import sys
+import cPickle
+import base64
+
 from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from logstore.thrift_protocol.plain.protocol import InternalConductorService
 from thrift.transport import TSocket
 from thrift.transport.TTransport import TFramedTransport, TBufferedTransport
 from thrift.protocol import TBinaryProtocol
-import json
-import sys
 import pika
+import requests
+
+
+web_uri = sys.argv[1]
+FORMAT_CACHE = {}
+
+
+def get_format(file_name):
+    if file_name in FORMAT_CACHE:
+        return FORMAT_CACHE[file_name]
+
+    resp = requests.get(web_uri+"/api/get_formats", params={"formats": file_name})
+    if resp.status_code != 200:
+        return
+
+    format_s = base64.decodestring(resp.text)
+    format_list = cPickle.loads(format_s)
+
+    if format_list:
+        FORMAT_CACHE[file_name] = format_list[0]
+        return format_list[0]
 
 
 def main():
     es = Elasticsearch('http://localhost:9200/')
+
+
     try:
         es.indices.create("logs", body={
             "mappings": {
@@ -65,14 +91,21 @@ def main():
             message = message["data"]
 
             read_time = parse(message["read_time"])
+
+            data = message.get("data", {})
+            formatter = get_format(message["file_name"])
+            if formatter:
+                try:
+                    data.update(formatter.process(message["log_message"]))
+                except Exception:
+                    pass
+
             doc = {
                 "message": message["log_message"],
                 "read_time": read_time,
                 "server_id": message["server_id"],
                 "file_name": message["file_name"],
-                "data": {
-                    "omg": 10
-                }
+                "data": data
             }
 
             result = es.index(index="logs", doc_type="line", body=doc)
@@ -82,7 +115,8 @@ def main():
                                       read_time.isoformat(),
                                       doc["server_id"],
                                       doc["file_name"],
-                                      set((m["_id"] for m in percolate_result["matches"])))
+                                      set((m["_id"] for m in percolate_result["matches"])),
+                                      result["_id"])
                 sys.stdout.write("!")
             sys.stdout.write(".")
 

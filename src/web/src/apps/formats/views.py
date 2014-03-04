@@ -1,8 +1,10 @@
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView, FormView
 from django.views.generic.base import ContextMixin
+from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
-from .models import Format, Splitter, Field, Transform
-from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm
+
+from .models import Format, Splitter, Field, Transform, FormatFile
+from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm, FormatFilesForm
 
 
 class FormatMixin(ContextMixin):
@@ -115,3 +117,33 @@ class AddTransformationView(FormatMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy("formats:modify_field", args=[self.kwargs["format_id"],
                                                           self.object.field_id])
+
+
+class EditFormatFilesView(FormatMixin, SingleObjectMixin, FormView):
+    form_class = FormatFilesForm
+    template_name = "edit_files.html"
+    model = Format
+    pk_url_kwarg = "format_id"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(EditFormatFilesView, self).dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {
+            "files": ", ".join((f.name for f in self.object.files.all()))
+        }
+
+    def form_valid(self, form):
+        files = set(x.strip() for x in form.cleaned_data["files"].split(","))
+
+        self.object.files.all().delete()
+
+        FormatFile.objects.bulk_create(
+            [FormatFile(name=n, format=self.object) for n in files]
+        )
+
+        return super(EditFormatFilesView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("formats:edit", args=[self.get_object().id])

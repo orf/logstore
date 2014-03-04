@@ -1,5 +1,6 @@
 from django.views.generic import CreateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+
 from .models import Server
 from .forms import AddServerForm
 

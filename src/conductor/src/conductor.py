@@ -14,9 +14,11 @@ def make_daemon_server_factory(frontend, queue, ws):
                                              frontend=frontend, queue=queue, websockets=ws)
 
 
-def make_internal_server_factory(ws_factory, daemon_service_factory):
+def make_internal_server_factory(ws_factory, daemon_service_factory, frontend):
     return InternalServiceFactory(None, TBinaryProtocol.TBinaryProtocolFactory(),
-                                  websocket_factory=ws_factory, daemon_service_factory=daemon_service_factory)
+                                  websocket_factory=ws_factory,
+                                  daemon_service_factory=daemon_service_factory,
+                                  frontend=frontend)
 
 
 def make_service(config):
@@ -26,7 +28,7 @@ def make_service(config):
     ws_factory = LiveUpdateFactory("ws://localhost:6062")
     conductor_service = service.MultiService()
     daemon_service_factory = make_daemon_server_factory(frontend, queue_factory, ws_factory)
-    internal_service_factory = make_internal_server_factory(ws_factory, daemon_service_factory)
+    internal_service_factory = make_internal_server_factory(ws_factory, daemon_service_factory, frontend)
     syslog_factory = SysLogFactory(frontend, queue_factory)
 
     internet.TCPClient("localhost", 5672, queue_factory).setServiceParent(conductor_service)

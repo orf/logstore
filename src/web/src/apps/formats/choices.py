@@ -4,8 +4,9 @@ from django_choice_object import Choice
 class SplitterChoice(Choice):
     NONE = 0
     CHARACTER = 1
-    SHLEX = 2
-    REGEX = 3
+    SPACE = 2
+    SHLEX = 3
+    REGEX = 4
 
 
 class TypeChoice(Choice):

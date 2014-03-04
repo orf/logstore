@@ -1,7 +1,8 @@
 from twisted.internet.protocol import ReconnectingClientFactory
-from .protocol import RabbitMQConnectionProtocol
 from twisted.internet.defer import DeferredQueue
 import pika
+
+from .protocol import RabbitMQConnectionProtocol
 
 
 class RabbitMQConnectionFactory(ReconnectingClientFactory):

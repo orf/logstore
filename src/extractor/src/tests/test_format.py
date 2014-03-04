@@ -1,7 +1,8 @@
+import unittest
+
 from ..base import Format, Field, FieldSource
 from ..splitters import Character
 from ..transformers import StripTransformer
-import unittest
 
 
 class FormatTests(unittest.TestCase):

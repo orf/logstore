@@ -1,7 +1,7 @@
+import datetime
+
 from django.db import models
 from model_utils.fields import MonitorField
-
-import datetime
 
 
 class Server(models.Model):

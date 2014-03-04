@@ -1,7 +1,8 @@
+import json
+
 from zope.interface import implements
 from logstore.thrift_protocol.twisted.protocol import ConductorService
 from twisted.python import log
-import json
 
 
 class ConductorServiceHandler(object):

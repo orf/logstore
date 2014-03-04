@@ -1,13 +1,15 @@
-from autobahn.wamp1.protocol import WampServerFactory
-from.protocol import LiveUpdateProtocol
 from collections import defaultdict
+import hashlib
+import json
+
+from autobahn.wamp1.protocol import WampServerFactory
 from zope.interface import implements
 from twisted.web.iweb import IBodyProducer
 from twisted.internet import defer, reactor
 from twisted.web.client import Agent, HTTPConnectionPool, readBody, Headers
 from twisted.python import log
-import hashlib
-import json
+
+from.protocol import LiveUpdateProtocol
 
 
 http_pool = HTTPConnectionPool(reactor)
@@ -64,16 +66,16 @@ class LiveUpdateFactory(WampServerFactory):
 
     @defer.inlineCallbacks
     def add_query(self, query):
-        query_hash = hashlib.md5(query).hexdigest()
-        print "Adding query '%s' -> %s" % (query, query_hash)
-        create = query_hash not in self.percolators
+        percolator_name = "lu:%s" % hashlib.md5(query).hexdigest()
+        print "Adding query '%s' -> %s" % (query, percolator_name)
+        create = percolator_name not in self.percolators
 
-        self.percolators[query_hash] += 1
+        self.percolators[percolator_name] += 1
         if create:
             print "Creating percolator..."
             resp = yield web_agent.request(
                 "PUT",
-                "http://localhost:9200/logs/.percolator/%s" % hashlib.md5(query).hexdigest(),
+                "http://localhost:9200/logs/.percolator/%s" % percolator_name,
                 Headers(),
                 StringProducer(json.dumps(
                     {
@@ -88,18 +90,19 @@ class LiveUpdateFactory(WampServerFactory):
             body = yield readBody(resp)  # Is this needed?
             print "Percolator created: %s" % body
 
-        defer.returnValue(query_hash)
+        defer.returnValue(percolator_name)
 
     @defer.inlineCallbacks
-    def got_percolator_hit(self, line, time, server_id, file_name, hashes):
-        for hash in (h for h in hashes if h in self.percolators):
+    def got_percolator_hit(self, line, time, server_id, file_name, hash, search_id):
+        if hash in self.percolators:
             yield self.dispatch("logbook/live/%s" % hash,
                                 {
                                     "_source": {
                                         "message": line,
                                         "read_time": time,
                                         "server_id": server_id,
-                                        "file_name": file_name
+                                        "file_name": file_name,
+                                        "search_id": search_id
                                     }
                                 })
 
