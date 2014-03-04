@@ -6,3 +6,6 @@
 #  options string: py:twisted,slots,utf8strings,new_style
 #
 
+from thrift.Thrift import TType, TMessageType, TException, TApplicationException
+from ttypes import *
+

@@ -1,1 +1,1 @@
-__author__ = 'tom'
+from . import signals

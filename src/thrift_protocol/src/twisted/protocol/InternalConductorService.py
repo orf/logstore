@@ -6,12 +6,11 @@
 #  options string: py:twisted,slots,utf8strings,new_style
 #
 
+from thrift.Thrift import TType, TMessageType, TException, TApplicationException
+from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
-
-from ttypes import *
-
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -19,7 +18,7 @@ except:
 
 from zope.interface import Interface, implements
 from twisted.internet import defer
-
+from thrift.transport import TTwisted
 
 class Iface(Interface):
   def remove_server(server_id):
@@ -36,14 +35,14 @@ class Iface(Interface):
     """
     pass
 
-  def remove_event(id):
+  def remove_event(percolate_id):
     """
     Parameters:
-     - id
+     - percolate_id
     """
     pass
 
-  def percolator_hit(logline, time, server_id, file_name, hits):
+  def percolator_hit(logline, time, server_id, file_name, hits, search_id):
     """
     Parameters:
      - logline
@@ -51,6 +50,7 @@ class Iface(Interface):
      - server_id
      - file_name
      - hits
+     - search_id
     """
     pass
 
@@ -130,21 +130,21 @@ class Client(object):
       return d.callback(result.success)
     return d.errback(TApplicationException(TApplicationException.MISSING_RESULT, "create_event failed: unknown result"))
 
-  def remove_event(self, id):
+  def remove_event(self, percolate_id):
     """
     Parameters:
-     - id
+     - percolate_id
     """
     self._seqid += 1
     d = self._reqs[self._seqid] = defer.Deferred()
-    self.send_remove_event(id)
+    self.send_remove_event(percolate_id)
     return d
 
-  def send_remove_event(self, id):
+  def send_remove_event(self, percolate_id):
     oprot = self._oprot_factory.getProtocol(self._transport)
     oprot.writeMessageBegin('remove_event', TMessageType.CALL, self._seqid)
     args = remove_event_args()
-    args.id = id
+    args.percolate_id = percolate_id
     args.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -163,7 +163,7 @@ class Client(object):
       return d.callback(result.success)
     return d.errback(TApplicationException(TApplicationException.MISSING_RESULT, "remove_event failed: unknown result"))
 
-  def percolator_hit(self, logline, time, server_id, file_name, hits):
+  def percolator_hit(self, logline, time, server_id, file_name, hits, search_id):
     """
     Parameters:
      - logline
@@ -171,12 +171,13 @@ class Client(object):
      - server_id
      - file_name
      - hits
+     - search_id
     """
     self._seqid += 1
-    self.send_percolator_hit(logline, time, server_id, file_name, hits)
+    self.send_percolator_hit(logline, time, server_id, file_name, hits, search_id)
     return defer.succeed(None)
 
-  def send_percolator_hit(self, logline, time, server_id, file_name, hits):
+  def send_percolator_hit(self, logline, time, server_id, file_name, hits, search_id):
     oprot = self._oprot_factory.getProtocol(self._transport)
     oprot.writeMessageBegin('percolator_hit', TMessageType.CALL, self._seqid)
     args = percolator_hit_args()
@@ -185,6 +186,7 @@ class Client(object):
     args.server_id = server_id
     args.file_name = file_name
     args.hits = hits
+    args.search_id = search_id
     args.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -251,7 +253,7 @@ class Processor(TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = remove_event_result()
-    d = defer.maybeDeferred(self._handler.remove_event, args.id)
+    d = defer.maybeDeferred(self._handler.remove_event, args.percolate_id)
     d.addCallback(self.write_results_success_remove_event, result, seqid, oprot)
     return d
 
@@ -266,7 +268,7 @@ class Processor(TProcessor):
     args = percolator_hit_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    d = defer.maybeDeferred(self._handler.percolator_hit, args.logline, args.time, args.server_id, args.file_name, args.hits)
+    d = defer.maybeDeferred(self._handler.percolator_hit, args.logline, args.time, args.server_id, args.file_name, args.hits, args.search_id)
     return d
 
 
@@ -499,7 +501,7 @@ class create_event_result(object):
    ]
 
   thrift_spec = (
-    (0, TType.BOOL, 'success', None, None, ), # 0
+    (0, TType.STRING, 'success', None, None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -515,8 +517,8 @@ class create_event_result(object):
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.BOOL:
-          self.success = iprot.readBool();
+        if ftype == TType.STRING:
+          self.success = iprot.readString().decode('utf-8')
         else:
           iprot.skip(ftype)
       else:
@@ -530,8 +532,8 @@ class create_event_result(object):
       return
     oprot.writeStructBegin('create_event_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.BOOL, 0)
-      oprot.writeBool(self.success)
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success.encode('utf-8'))
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -562,20 +564,20 @@ class create_event_result(object):
 class remove_event_args(object):
   """
   Attributes:
-   - id
+   - percolate_id
   """
 
   __slots__ = [ 
-    'id',
+    'percolate_id',
    ]
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'id', None, None, ), # 1
+    (1, TType.STRING, 'percolate_id', None, None, ), # 1
   )
 
-  def __init__(self, id=None,):
-    self.id = id
+  def __init__(self, percolate_id=None,):
+    self.percolate_id = percolate_id
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -587,8 +589,8 @@ class remove_event_args(object):
       if ftype == TType.STOP:
         break
       if fid == 1:
-        if ftype == TType.I32:
-          self.id = iprot.readI32();
+        if ftype == TType.STRING:
+          self.percolate_id = iprot.readString().decode('utf-8')
         else:
           iprot.skip(ftype)
       else:
@@ -601,9 +603,9 @@ class remove_event_args(object):
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('remove_event_args')
-    if self.id is not None:
-      oprot.writeFieldBegin('id', TType.I32, 1)
-      oprot.writeI32(self.id)
+    if self.percolate_id is not None:
+      oprot.writeFieldBegin('percolate_id', TType.STRING, 1)
+      oprot.writeString(self.percolate_id.encode('utf-8'))
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -710,6 +712,7 @@ class percolator_hit_args(object):
    - server_id
    - file_name
    - hits
+   - search_id
   """
 
   __slots__ = [ 
@@ -718,6 +721,7 @@ class percolator_hit_args(object):
     'server_id',
     'file_name',
     'hits',
+    'search_id',
    ]
 
   thrift_spec = (
@@ -727,14 +731,16 @@ class percolator_hit_args(object):
     (3, TType.I32, 'server_id', None, None, ), # 3
     (4, TType.STRING, 'file_name', None, None, ), # 4
     (5, TType.SET, 'hits', (TType.STRING,None), None, ), # 5
+    (6, TType.STRING, 'search_id', None, None, ), # 6
   )
 
-  def __init__(self, logline=None, time=None, server_id=None, file_name=None, hits=None,):
+  def __init__(self, logline=None, time=None, server_id=None, file_name=None, hits=None, search_id=None,):
     self.logline = logline
     self.time = time
     self.server_id = server_id
     self.file_name = file_name
     self.hits = hits
+    self.search_id = search_id
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -775,6 +781,11 @@ class percolator_hit_args(object):
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRING:
+          self.search_id = iprot.readString().decode('utf-8')
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -807,6 +818,10 @@ class percolator_hit_args(object):
       for iter13 in self.hits:
         oprot.writeString(iter13.encode('utf-8'))
       oprot.writeSetEnd()
+      oprot.writeFieldEnd()
+    if self.search_id is not None:
+      oprot.writeFieldBegin('search_id', TType.STRING, 6)
+      oprot.writeString(self.search_id.encode('utf-8'))
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

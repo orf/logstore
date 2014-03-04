@@ -51,46 +51,60 @@ class LiveUpdateFactory(WampServerFactory):
             if self.percolators[query_hash] == 0:
                 print "Removing percolator"
                 del self.percolators[query_hash]
-
                 # ToDo: Some kind of locking here
-
-                resp = yield web_agent.request(
-                    "DELETE",
-                    "http://localhost:9200/logs/.percolator/%s" % query_hash,
-                    Headers(),
-                    None
-                )
-
-                body = yield readBody(resp)  # ToDo: Check if this this needed
+                yield self.remove_percolator(query_hash)
 
 
     @defer.inlineCallbacks
-    def add_query(self, query):
-        percolator_name = "lu:%s" % hashlib.md5(query).hexdigest()
-        print "Adding query '%s' -> %s" % (query, percolator_name)
-        create = percolator_name not in self.percolators
+    def remove_percolator(self, query_hash):
+        resp = yield web_agent.request(
+            "DELETE",
+            "http://localhost:9200/logs/.percolator/%s" % str(query_hash),
+            Headers(),
+            None
+        )
 
-        self.percolators[percolator_name] += 1
-        if create:
-            print "Creating percolator..."
-            resp = yield web_agent.request(
-                "PUT",
-                "http://localhost:9200/logs/.percolator/%s" % percolator_name,
-                Headers(),
-                StringProducer(json.dumps(
-                    {
-                        "query": {
-                            "query_string": {
-                                "query": query
-                            }
+        yield readBody(resp)  # ToDo: Check if this this needed
+
+    @defer.inlineCallbacks
+    def add_live_update_query(self, query):
+        query_hash = self.get_query_hash(query, namespace="lu")
+        if query_hash not in self.percolators:
+            yield self.create_percolator(query, query_hash)
+        defer.returnValue(query_hash)
+
+    @defer.inlineCallbacks
+    def add_event_query(self, query):
+        query_hash = self.get_query_hash(query, namespace="ev")
+        r = yield self.create_percolator(query, query_hash)
+        defer.returnValue(query_hash if r else None)
+
+    def get_query_hash(self, query, namespace):
+        return "%s:%s" % (namespace, hashlib.md5(query).hexdigest())
+
+    @defer.inlineCallbacks
+    def create_percolator(self, query, percolate_id):
+        print "Adding query '%s' -> %s" % (query, percolate_id)
+
+        resp = yield web_agent.request(
+            "PUT",
+            "http://localhost:9200/logs/.percolator/%s" % percolate_id,
+            Headers(),
+            StringProducer(json.dumps(
+                {
+                    "query": {
+                        "query_string": {
+                            "query": query
                         }
-                    }))
+                    }
+                })
             )
+        )
 
-            body = yield readBody(resp)  # Is this needed?
-            print "Percolator created: %s" % body
+        body = yield readBody(resp)  # Is this needed?
+        print "Percolator created: %s" % body
 
-        defer.returnValue(percolator_name)
+        defer.returnValue(True)
 
     @defer.inlineCallbacks
     def got_percolator_hit(self, line, time, server_id, file_name, hash, search_id):

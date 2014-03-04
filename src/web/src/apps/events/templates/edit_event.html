@@ -1,0 +1,66 @@
+{% extends "events_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block tail_includes %}
+    <script>
+        $(document).ready(function(){
+            $(".delete_link").click(function(){
+                $(this).parent("form").submit();
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block event_content %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="panel">
+                <strong>Files:</strong>
+                {% if event.files.count %}
+                    <a href="{% url "events:edit_files" event.id %}">
+                        {% for file in event.files.all %}
+                            {{ file.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </a>
+                {% else %}
+                    <a href="{% url "events:edit_files" event.id %}">Specify files</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-7 columns">
+            <table>
+                <thead>
+                    <th>Name</th>
+                    <th>Weight</th>
+                    <th width="100%">Query</th>
+                    <th></th>
+                </thead>
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ object.name }}</td>
+                        <td>{{ object.weight }}</td>
+                        <td>{{ object.query }}</td>
+                        <td>
+                            <div class="row collapse">
+                                <div class="large-12 columns">
+                                    <form method="POST" action="{% url "events:delete_query" event.id object.id %}">
+                                        {% csrf_token %}
+                                        <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="small-5 columns">
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock %}

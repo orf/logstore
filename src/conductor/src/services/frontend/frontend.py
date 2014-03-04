@@ -1,4 +1,5 @@
 import urllib
+import functools
 
 from twisted.internet import defer, reactor
 from twisted.web import client
@@ -10,8 +11,19 @@ pool.maxPersistentPerHost = 4
 
 
 class FrontendConnector(object):
+    lock = defer.DeferredSemaphore(5)
+
     def __init__(self, frontend_addr):
         self.frontend_addr = frontend_addr
+
+    def lock_wrapper(func):
+        @functools.wraps(func)
+        @defer.inlineCallbacks
+        def lock_wrapper(self, *args, **kwargs):
+            r = yield self.lock.run(func, self, *args, **kwargs)
+            defer.returnValue(r)
+
+        return lock_wrapper
 
     @defer.inlineCallbacks
     def check_ip(self, ip_address):
@@ -30,9 +42,10 @@ class FrontendConnector(object):
                                                               "file_name": file_name,
                                                               "hit": hit,
                                                               "search_id": search_id})
-
+        print "lol"
 
     # Internal methods
+    @lock_wrapper
     @defer.inlineCallbacks
     def _send_request(self, api_method, args=None):
         """

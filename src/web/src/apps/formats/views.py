@@ -8,7 +8,6 @@ from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm, Format
 
 
 class FormatMixin(ContextMixin):
-
     def get_context_data(self, **kwargs):
         kwargs["format"] = Format.objects.get(id=self.kwargs["format_id"])
         try:
@@ -67,9 +66,7 @@ class SplitterView(FormatMixin, UpdateView):
             return None
 
     def form_valid(self, form):
-        self.object = form.save(False)
-        self.object.format_id = self.kwargs["format_id"]
-        self.object.save()
+        form.instance.format_id = self.kwargs["format_id"]
         return super(SplitterView, self).form_valid(form)
 
     def get_success_url(self):
@@ -109,9 +106,7 @@ class AddTransformationView(FormatMixin, UpdateView):
             return None
 
     def form_valid(self, form):
-        self.object = form.save(False)
-        self.object.field_id = self.kwargs["field_id"]
-        self.object.save()
+        form.instance.field_id = self.kwargs["field_id"]
         return super(AddTransformationView, self).form_valid(form)
 
     def get_success_url(self):
@@ -121,7 +116,7 @@ class AddTransformationView(FormatMixin, UpdateView):
 
 class EditFormatFilesView(FormatMixin, SingleObjectMixin, FormView):
     form_class = FormatFilesForm
-    template_name = "edit_files.html"
+    template_name = "edit_format_files.html"
     model = Format
     pk_url_kwarg = "format_id"
 

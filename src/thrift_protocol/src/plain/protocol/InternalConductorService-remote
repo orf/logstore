@@ -10,7 +10,6 @@
 import sys
 import pprint
 from urlparse import urlparse
-
 from thrift.transport import TTransport
 from thrift.transport import TSocket
 from thrift.transport import THttpClient
@@ -19,16 +18,15 @@ from thrift.protocol import TBinaryProtocol
 from protocol import InternalConductorService
 from protocol.ttypes import *
 
-
 if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print ''
   print 'Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] function [arg1 [arg2...]]'
   print ''
   print 'Functions:'
   print '  bool remove_server(i32 server_id)'
-  print '  bool create_event(Event event)'
-  print '  bool remove_event(i32 id)'
-  print '  void percolator_hit(string logline, string time, i32 server_id, string file_name,  hits)'
+  print '  string create_event(Event event)'
+  print '  bool remove_event(string percolate_id)'
+  print '  void percolator_hit(string logline, string time, i32 server_id, string file_name,  hits, string search_id)'
   print ''
   sys.exit(0)
 
@@ -96,13 +94,13 @@ elif cmd == 'remove_event':
   if len(args) != 1:
     print 'remove_event requires 1 args'
     sys.exit(1)
-  pp.pprint(client.remove_event(eval(args[0]),))
+  pp.pprint(client.remove_event(args[0],))
 
 elif cmd == 'percolator_hit':
-  if len(args) != 5:
-    print 'percolator_hit requires 5 args'
+  if len(args) != 6:
+    print 'percolator_hit requires 6 args'
     sys.exit(1)
-  pp.pprint(client.percolator_hit(args[0],args[1],eval(args[2]),args[3],eval(args[4]),))
+  pp.pprint(client.percolator_hit(args[0],args[1],eval(args[2]),args[3],eval(args[4]),args[5],))
 
 else:
   print 'Unrecognized method %s' % cmd

@@ -5,7 +5,6 @@ struct Event {
     3: string query
 }
 
-
 struct LogLine {
     1: string file_name,
     2: string read_time,
@@ -23,10 +22,12 @@ service ConductorService {
 service InternalConductorService {
     // Terminate all connections from this server
     bool remove_server(1:i32 server_id),
+
     // Notifies the conductor when a new Event has been added
-    bool create_event(1:Event event),
+    string create_event(1:Event event),
     // Notifies the conductor when an Event has been removed
-    bool remove_event(1:i32 id),
+    bool remove_event(1:string percolate_id),
+
     // Notifies the conductor of a percolator(s) hit
     oneway void percolator_hit(1:string logline, 2:string time, 3:i32 server_id,
                                4:string file_name, 5:set<string> hits, 6:string search_id)

@@ -9,7 +9,7 @@ class LiveUpdateProtocol(WampServerProtocol):
     @exportRpc
     @defer.inlineCallbacks
     def subscribe(self, query):
-        self.query_hash = yield self.factory.add_query(query)
+        self.query_hash = yield self.factory.add_live_update_query(query)
         self.registerForPubSub("logbook/live/%s" % self.query_hash, pubsub=self.SUBSCRIBE)
         defer.returnValue(self.query_hash)
 
@@ -18,7 +18,7 @@ class LiveUpdateProtocol(WampServerProtocol):
     def change_subscription(self, query):
         if self.query_hash is not None:
             yield self.factory.remove_client(self.query_hash)
-            self.query_hash = yield self.factory.add_query(query)
+            self.query_hash = yield self.factory.add_live_update_query(query)
             defer.returnValue(self.query_hash)
 
     def onSessionOpen(self):
