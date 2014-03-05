@@ -16,7 +16,8 @@ setup(name="logstore.conductor",
                         "logstore.web",
                         "twisted==13.2.0",
                         "autobahn",
-                        "pika"])
+                        "pika",
+                        "treq"])
 
 try:
     from twisted.plugin import IPlugin, getPlugins

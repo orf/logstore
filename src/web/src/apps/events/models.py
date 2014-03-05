@@ -17,10 +17,14 @@ class EventQuery(models.Model):
     name = models.CharField(max_length=250)
     weight = models.IntegerField()
     query = models.CharField(max_length=1024)
-    percolate_hash = models.TextField()
+    percolate_hash = models.TextField(default="")
 
     event = models.ForeignKey("events.Event", related_name="queries")
 
-    def save(self, *args, **kwargs):
-        self.hash = hashlib.md5(self.query).hexdigest()
-        return super(EventQuery, self).save(*args, **kwargs)
+    def __unicode__(self):
+        return "<EventQuery: %s / %s / %s>" %(self.name, self.weight, self.query)
+
+    def get_query(self):
+        return "(%s) AND (%s)" % (" OR ".join('file_name:"%s"' % name
+                                                for name in self.event.files.values_list("name")),
+                                    self.query)

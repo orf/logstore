@@ -11,16 +11,15 @@ class RabbitMQConnectionFactory(ReconnectingClientFactory):
 
     def __init__(self):
         self.parse_queue = DeferredQueue()
-        self.analyse_queue = DeferredQueue()
+        self.event_queue = DeferredQueue()
 
     def queue_message(self, message):
         self.parse_queue.put(message)
 
-    def queue_analyse(self, message):
-        self.analyse_queue.put(message)
+    #def queue_analyse(self, message):
+    #    self.event_queue.put(message)
 
     def buildProtocol(self, addr):
-        p = self.protocol(pika.ConnectionParameters(), input_queues={"parse": self.parse_queue,
-                                                                     "analyse": self.analyse_queue})
+        p = self.protocol(pika.ConnectionParameters(), input_queues={"parse": self.parse_queue})
         p.factory = self
         return p

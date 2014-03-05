@@ -54,20 +54,3 @@ class ServerAuthView(View):
             return HttpResponse("", status=401)
         else:
             return HttpResponse(str(server.id), status=200)
-
-
-class SerializeFormatView(View):
-    def get(self, request, *args, **kwargs):
-        name = self.request.GET.getlist("formats")
-        formats = Format.objects.filter(files__name__in=name).exclude(splitter=None).all()
-
-        if not formats:
-            raise Http404()
-
-        return HttpResponse(base64.encodestring(cPickle.dumps([f.create_format() for f in formats],
-                                                              protocol=cPickle.HIGHEST_PROTOCOL)), status=200)
-
-
-class EventHitView(SingleObjectMixin, View):
-    def get_queryset(self):
-        return Event.objects.filter(hash=self.request.GET["HIT"])

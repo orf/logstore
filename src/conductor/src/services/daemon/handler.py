@@ -20,13 +20,10 @@ class ConductorServiceHandler(object):
         self.factory.queue.queue_message(
             json.dumps(
                 {
-                    "method": "ANALYZE",
-                    "data": {
-                        "server_id": self.server_id,
-                        "file_name": line.file_name,
-                        "read_time": line.read_time,
-                        "log_message": line.log_line
-                    }
+                    "server_id": self.server_id,
+                    "file_name": line.file_name,
+                    "read_time": line.read_time,
+                    "log_message": line.log_line
                 }
             )
         )

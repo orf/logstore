@@ -61,7 +61,6 @@ class LiveUpdateFactory(WampServerFactory):
             "DELETE",
             "http://localhost:9200/logs/.percolator/%s" % str(query_hash),
             Headers(),
-            None
         )
 
         yield readBody(resp)  # ToDo: Check if this this needed
@@ -71,6 +70,7 @@ class LiveUpdateFactory(WampServerFactory):
         query_hash = self.get_query_hash(query, namespace="lu")
         if query_hash not in self.percolators:
             yield self.create_percolator(query, query_hash)
+            self.percolators[query_hash] = 0
         defer.returnValue(query_hash)
 
     @defer.inlineCallbacks

@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'apps.formats',
     'apps.events',
     'apps.api',
+    'apps.services',
 
     'djangojs',
     'django.contrib.admin',

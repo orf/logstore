@@ -44,7 +44,7 @@ def handle_event_query_creation(sender, **kwargs):
         hash_result = client.create_event(
             Event(id=inst.id,
                   name=inst.name,
-                  query=inst.query)
+                  query=inst.get_query())
         )
         transport.close()
         print "Hash: %s" % hash_result

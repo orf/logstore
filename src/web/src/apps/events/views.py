@@ -70,6 +70,9 @@ class EditEventFilesView(SingleObjectMixin, FormView):
         }
 
     def form_valid(self, form):
+        event_queries = list(self.object.queries.all())
+        self.object.queries.all().delete()
+
         files = set(x.strip() for x in form.cleaned_data["files"].split(","))
 
         self.object.files.all().delete()
@@ -77,6 +80,10 @@ class EditEventFilesView(SingleObjectMixin, FormView):
         EventFile.objects.bulk_create(
             [EventFile(name=n, event=self.object) for n in files]
         )
+
+        for ev in event_queries:
+            ev.id = None
+            ev.save()
 
         return super(EditEventFilesView, self).form_valid(form)
 

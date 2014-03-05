@@ -18,7 +18,6 @@ class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
 
     @defer.inlineCallbacks
     def _pump_messages(self, connection, input_queue, exchange_name, queue_name):
-
         channel = yield connection.channel()
         exchange = yield channel.exchange_declare(exchange=exchange_name, type="fanout")
         queue = yield channel.queue_declare(queue=queue_name, auto_delete=False, durable=True)
@@ -26,11 +25,10 @@ class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
 
         while True:
             message = yield input_queue.get()
-
             try:
                 if not connection.transport.connected:
                     raise Exception("Not connected to RabbitMQ!")
-                yield channel.basic_publish(exchange="to_parse", body=message, routing_key="",
+                yield channel.basic_publish(exchange=exchange_name, body=message, routing_key="",
                                             properties=pika.BasicProperties(delivery_mode=2))
             except Exception, e:
                 log.err(e, _why="Error sending message, terminating")

@@ -1,61 +1,31 @@
 import urllib
 import functools
 
-from twisted.internet import defer, reactor
+from twisted.internet import defer, reactor, task
 from twisted.web import client
 from twisted.web.client import HTTPConnectionPool
-
+from twisted.web.http_headers import Headers
+from cStringIO import StringIO
+from twisted.web.iweb import IBodyProducer
+from zope.interface import implements
+import treq
 
 pool = HTTPConnectionPool(reactor, persistent=True)
-pool.maxPersistentPerHost = 4
+#pool.maxPersistentPerHost = 4
 
 
 class FrontendConnector(object):
-    lock = defer.DeferredSemaphore(5)
 
     def __init__(self, frontend_addr):
         self.frontend_addr = frontend_addr
-
-    def lock_wrapper(func):
-        @functools.wraps(func)
-        @defer.inlineCallbacks
-        def lock_wrapper(self, *args, **kwargs):
-            r = yield self.lock.run(func, self, *args, **kwargs)
-            defer.returnValue(r)
-
-        return lock_wrapper
+        self.lock = defer.DeferredLock()
+        self.api_path = "%s/api" % self.frontend_addr
 
     @defer.inlineCallbacks
     def check_ip(self, ip_address):
-        response = yield self._send_request("server_auth", {"ip": ip_address})
+        response = yield treq.get("%s/server_auth?ip=%s" % (self.api_path, ip_address))
+
         if response.code != 200:
             defer.returnValue(False)
-
         body = yield client.readBody(response)
         defer.returnValue(int(body))
-
-    @defer.inlineCallbacks
-    def got_percolator_hit(self, logline, time, server_name, file_name, hit, search_id):
-        response = yield self._send_request("got_event_hit", {"logline": logline,
-                                                              "time": time,
-                                                              "server_name": server_name,
-                                                              "file_name": file_name,
-                                                              "hit": hit,
-                                                              "search_id": search_id})
-        print "lol"
-
-    # Internal methods
-    @lock_wrapper
-    @defer.inlineCallbacks
-    def _send_request(self, api_method, args=None):
-        """
-        Send a request to the API method given and return the response
-        """
-        agent = client.Agent(reactor, pool=pool)
-        path = "%s/api/%s?%s" % (self.frontend_addr, api_method, urllib.urlencode(args or {}))
-        print "Requesting %s" % path
-        response = yield agent.request(
-            "GET",
-            path
-        )
-        defer.returnValue(response)
