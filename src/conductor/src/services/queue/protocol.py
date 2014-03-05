@@ -6,21 +6,26 @@ import pika
 
 
 class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
-    def __init__(self, parameters, input_queue):
-        self.__input_queue = input_queue
+    def __init__(self, parameters, input_queues):
         super(RabbitMQConnectionProtocol, self).__init__(parameters)
-        self._pump_messages()
+        self.pump(input_queues)
 
     @defer.inlineCallbacks
-    def _pump_messages(self):
+    def pump(self, queues):
         connection = yield self.ready
+        for name, queue in queues.items():
+            self._pump_messages(connection, queue, name, name)
+
+    @defer.inlineCallbacks
+    def _pump_messages(self, connection, input_queue, exchange_name, queue_name):
+
         channel = yield connection.channel()
-        exchange = yield channel.exchange_declare(exchange="to_parse", type="fanout")
-        queue = yield channel.queue_declare(queue="parse_queue", auto_delete=False, durable=True)
-        yield channel.queue_bind(exchange="to_parse", queue="parse_queue")
+        exchange = yield channel.exchange_declare(exchange=exchange_name, type="fanout")
+        queue = yield channel.queue_declare(queue=queue_name, auto_delete=False, durable=True)
+        yield channel.queue_bind(exchange=exchange_name, queue=queue_name)
 
         while True:
-            message = yield self.__input_queue.get()
+            message = yield input_queue.get()
 
             try:
                 if not connection.transport.connected:
@@ -29,7 +34,7 @@ class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
                                             properties=pika.BasicProperties(delivery_mode=2))
             except Exception, e:
                 log.err(e, _why="Error sending message, terminating")
-                self.__input_queue.put(message)
+                input_queue.put(message)
                 defer.returnValue(None)
 
     def connectionLost(self, reason):
