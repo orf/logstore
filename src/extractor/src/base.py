@@ -46,11 +46,40 @@ class Field(object):
 
     def process(self, tokens):
         token = self.source.get_token(tokens)
+        path = self.name
+        returner = {self.name: token}
 
         for transformer in self.transformers:
-            token = transformer.transform(token)
+            new_token, new_path = transformer.transform(token)
 
-        return {self.name: self.type(token) if self.type else token}
+            # Add new_token to path
+            returner = self.set_from_path(returner, path, new_token)
+
+            if new_path is not None:
+                path = "%s.%s" % (path, new_path)
+                token = self.get_from_path(returner, path)
+            else:
+                token = new_token
+
+        return returner
+        #return {self.name: token.get_data(type=self.type)}  #self.type(token) if self.type else token}
+
+    def set_from_path(self, dictionary, path, new_value):
+        split_path = path.split(".")
+        path_traverse, path_end = split_path[0:-1], split_path[-1]
+
+        r = dictionary
+        for key_name in path_traverse:
+            r = r[key_name]
+
+        r[path_end] = new_value
+        return dictionary
+
+    def get_from_path(self, dictionary, path):
+        r = dictionary
+        for key_name in path.split("."):
+            r = r[key_name]
+        return r
 
 
 class FieldSource(object):
@@ -63,7 +92,7 @@ class FieldSource(object):
 
 
 class Transformer(object):
-    def transform(self, message):
+    def transform(self, value):
         raise NotImplementedError()
 
 
