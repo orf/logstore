@@ -53,6 +53,7 @@ class LiveUpdateFactory(WampServerFactory):
                 del self.percolators[query_hash]
                 # ToDo: Some kind of locking here
                 yield self.remove_percolator(query_hash)
+                print "Removed percolator %s" % query_hash
 
 
     @defer.inlineCallbacks
@@ -70,7 +71,7 @@ class LiveUpdateFactory(WampServerFactory):
         query_hash = self.get_query_hash(query, namespace="lu")
         if query_hash not in self.percolators:
             yield self.create_percolator(query, query_hash)
-            self.percolators[query_hash] = 0
+        self.percolators[query_hash] += 1
         defer.returnValue(query_hash)
 
     @defer.inlineCallbacks
