@@ -44,13 +44,19 @@ class Field(object):
         self.transformers = transformers
         self.type = type
 
-    def process(self, tokens):
+    def process(self, tokens, get_transform_list=False):
         token = self.source.get_token(tokens)
         path = self.name
         returner = {self.name: token}
 
+        if get_transform_list:
+            transform_list = []
+
         for transformer in self.transformers:
             new_token, new_path = transformer.transform(token)
+
+            if get_transform_list:
+                transform_list.append(new_token)
 
             # Add new_token to path
             returner = self.set_from_path(returner, path, new_token)
@@ -60,6 +66,9 @@ class Field(object):
                 token = self.get_from_path(returner, path)
             else:
                 token = new_token
+
+        if get_transform_list:
+            return transform_list
 
         return returner
         #return {self.name: token.get_data(type=self.type)}  #self.type(token) if self.type else token}
