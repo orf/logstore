@@ -1,7 +1,8 @@
 from django.db import models
 from logstore.extractor.base import Format as ExtractorFormat, Field as ExtractorField, FieldSource
 from logstore.extractor.splitters import Character, Shlex, Regex, DoNothing, Space
-from logstore.extractor.transformers import StripTransformer
+from logstore.extractor.transformers import RemoveTransformer
+from ..analyser.extractor_additions.transformers import GeoIPLookup
 
 from .choices import SplitterChoice, TypeChoice, TransformChoice
 
@@ -58,8 +59,12 @@ class Field(models.Model):
 
 class Transform(models.Model):
     type = models.IntegerField(choices=TransformChoice)
-    args = models.CharField(max_length=250)
+    args = models.CharField(max_length=250, blank=True)
     field = models.ForeignKey("formats.Field", related_name="transformations")
 
+    class Meta:
+        ordering = ("id",)
+
     def get_transformer(self):
-        return {TransformChoice.STRIP: StripTransformer}[self.type](self.args)
+        return {TransformChoice.REMOVE: RemoveTransformer,
+                TransformChoice.IP_LOOKUP: GeoIPLookup}[self.type](self.args)

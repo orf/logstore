@@ -1,7 +1,6 @@
 from ._base import QueueProcessCommand
-from dateutil.parser import parse
 from logstore.web.apps.formats.models import Format
-from logstore.web.apps.events.models import Event, EventQuery
+from logstore.web.apps.events.models import EventQuery
 from dateutil.parser import parse
 
 
@@ -49,7 +48,7 @@ class Command(QueueProcessCommand):
                 search_id = result["_id"]
 
                 queries = self.get_events(event_ids)
-                if queries is None:
+                if not queries:
                     self.stdout.write("!", ending="")
                     return
 
@@ -94,6 +93,7 @@ class Command(QueueProcessCommand):
         for id in ids:
             if not id in self.event_cache:
                 try:
+                    # ToDo: Support multiple events with the same query hash
                     self.event_cache[id] = EventQuery.objects.get(percolate_hash=id)
                 except EventQuery.DoesNotExist:
                     self.event_cache[id] = None

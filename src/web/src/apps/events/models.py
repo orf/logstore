@@ -25,6 +25,9 @@ class EventQuery(models.Model):
         return "<EventQuery: %s / %s / %s>" %(self.name, self.weight, self.query)
 
     def get_query(self):
-        return "(%s) AND (%s)" % (" OR ".join('file_name:"%s"' % name
-                                                for name in self.event.files.values_list("name")),
-                                    self.query)
+        names, prefix = self.event.files.values_list("name"), ""
+
+        if names:
+            prefix = "(%s) AND "" OR ".join('file_name:"%s"' % name
+                                            for name in names)
+        return "%s (%s)" % (prefix, self.query)

@@ -142,3 +142,15 @@ class EditFormatFilesView(FormatMixin, SingleObjectMixin, FormView):
 
     def get_success_url(self):
         return reverse_lazy("formats:edit", args=[self.get_object().id])
+
+
+class DeleteTransformView(DeleteView):
+    model = Transform
+    http_method_names = ["post"]
+
+    def get_queryset(self):
+        return self.model.objects.filter(field__id=self.kwargs["field_id"],
+                                         field__format_id=self.kwargs["format_id"])
+
+    def get_success_url(self):
+        return reverse_lazy("formats:modify_field", args=[self.kwargs["format_id"], self.kwargs["field_id"]])

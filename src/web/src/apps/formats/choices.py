@@ -16,4 +16,5 @@ class TypeChoice(Choice):
 
 
 class TransformChoice(Choice):
-    STRIP = 1
+    REMOVE = 1
+    IP_LOOKUP = 2, "IP Country Lookup"

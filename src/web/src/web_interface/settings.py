@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'apps.dashboard',
     'apps.servers',
@@ -53,15 +54,17 @@ INSTALLED_APPS = (
     'apps.formats',
     'apps.events',
     'apps.api',
-    'apps.services',
+    'apps.analyser',
+    'apps.statistics',
 
+    'kronos',
     'djangojs',
     'django.contrib.admin',
     'debug_toolbar',
     'template_timings_panel',
     'crispy_forms',
     'crispy_forms_foundation',
-    'django_activeurl'
+    'django_activeurl',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -151,3 +154,5 @@ CONDUCTOR_PORT = 6061
 ELASTICSEARCH_URL = "http://localhost:9200/"
 
 JS_URLS_NAMESPACES = ["api", "servers"]
+
+GEOIP_DATABASE_DIR = os.path.join(BASE_DIR, "apps", "analyser", "geo_ip")

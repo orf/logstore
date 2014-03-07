@@ -19,6 +19,9 @@ setup(name="logstore.web",
           "crispy-forms-foundation",
           "django-activeurl",
           "django-model-utils",
+          "django-kronos",
           "elasticsearch",
           "psycopg2",
-          "ipaddr"])
+          "ipaddr",
+          "pygeoip",
+          "pytz"])

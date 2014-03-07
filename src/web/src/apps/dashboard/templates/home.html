@@ -1,5 +1,6 @@
-{% extends "dashboard_base.html" %}
+{% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block page_title %}Dashboard{% endblock %}
 
@@ -20,6 +21,13 @@
         <div class="large-3 medium-6 columns">
             <div class="panel">
                 <h5>Message Statistics</h5>
+                <p>
+                    Total messages: <strong>{{ stats.total_count|intcomma }}</strong><br/>
+                    Store Size: <strong>{{ stats.store_size|filesizeformat }}</strong><br/>
+                    Total Queries: <strong>{{ stats.total_queries|intcomma }}</strong><br/>
+                    Average Fetch Time: <strong>{{ stats.avg_fetch_time }}ms</strong><br/>
+                    <small>Updated <strong>{{ stats.time|naturaltime }}</strong></small>
+                </p>
             </div>
         </div>
 

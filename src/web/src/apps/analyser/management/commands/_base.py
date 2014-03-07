@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 import json
 
@@ -45,6 +45,7 @@ class QueueProcessCommand(BaseCommand):
 
         connection = pika.BlockingConnection()
         channel = connection.channel()
+        channel.basic_qos(prefetch_count=20)
 
         self.client = self.get_thrift_client()
 
@@ -90,11 +91,7 @@ class QueueProcessCommand(BaseCommand):
                             "read_time": {"type": "date"},
 
                             "data": {
-                                "type": "object",
-                                "dynamic": True,
-                                "properties": {
-                                    "ip": {"type": "ip"}
-                                }
+                                "type": "object"
                             },
 
                             "server_id": {

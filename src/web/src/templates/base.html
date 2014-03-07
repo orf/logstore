@@ -48,21 +48,12 @@
 
         {% block content_override %}
         <div class="row">
-            <div>
-                <div class="large-2 columns">
-                    &nbsp;
-                        {% block sidebar %}{% endblock %}
-                </div>
-            </div>
 
-
-            <div class="large-8 columns">
+            <div class="large-10 columns small-centered">
                 <div class="main_content">
                     {% block content %}{% endblock %}
                 </div>
             </div>
-
-            <div class="large-2 columns">&nbsp;</div>
         </div>
         {% endblock %}
 
