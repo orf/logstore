@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'apps.api',
     'apps.analyser',
     'apps.statistics',
+    'apps.alerts',
 
     'kronos',
     'djangojs',
