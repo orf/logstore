@@ -12,25 +12,20 @@ class InternalServiceHandler():
     def __init__(self, factory):
         self.factory = factory
 
-
     @defer.inlineCallbacks
     def percolator_hit(self, logline, time, server_name, file_name, hits, search_id):
 
         update_hits = [hit for hit in hits if hit.startswith("lu:")]
-        event_hits = [hit for hit in hits if hit.startswith("ev:")]
+        #event_hits = [hit for hit in hits if hit.startswith("ev:")]
 
         for update in update_hits:
             yield self.factory.websocket_factory.got_percolator_hit(logline, time, server_name, file_name,
                                                                     update, search_id)
 
-        if event_hits:
-            pass  # Do nothing for now
-            """self.factory.queue_factory.queue_analyse(json.dumps({"logline": logline,
-                                                                 "time": time,
-                                                                 "server_name": server_name,
-                                                                 "file_name": file_name,
-                                                                 "hits": event_hits,
-                                                                 "search_id": search_id}))"""
+        self.factory.stats.increment_stat("got_percolator_hit")
+
+    def increment_stat(self, stat_name):
+        self.factory.stats.increment_stat(stat_name)
 
     def remove_server(self, server_id):
         log.msg("Terminating all connections from %s" % server_id)

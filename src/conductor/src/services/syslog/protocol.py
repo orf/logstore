@@ -28,19 +28,15 @@ class SysLogProtocol(AuthenticatingMixin, LineReceiver):
         severity, facility = self._calc_lvl(line)
 
         self.factory.queue.queue_message(
-            json.dumps(
-                {
-                    "method": "ANALYZE",
-                    "data": {
-                        "data": {"severity": severity, "facility": facility},
+            json.dumps({"data": {"severity": severity, "facility": facility},
                         "server_id": self.server_id,
                         "file_name": "syslog",
                         "read_time": datetime.datetime.now().isoformat(),
                         "log_message": line
-                    }
-                }
-            )
+                    })
         )
+
+        self.factory.stats.increment_stat("got_log_line")
 
     def _calc_lvl(self, line):
         lvl = fs_match.split(line)

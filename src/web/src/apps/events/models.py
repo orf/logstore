@@ -28,6 +28,5 @@ class EventQuery(models.Model):
         names, prefix = self.event.files.values_list("name"), ""
 
         if names:
-            prefix = "(%s) AND "" OR ".join('file_name:"%s"' % name
-                                            for name in names)
+            prefix = "%s AND" % (" OR ".join('(file_name:"%s")' % name for name in names))
         return "%s (%s)" % (prefix, self.query)

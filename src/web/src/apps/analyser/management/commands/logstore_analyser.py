@@ -14,6 +14,9 @@ class Command(QueueProcessCommand):
         super(Command, self).__init__()
 
     def got_message(self, message):
+        if "read_time" not in message:
+            return
+
         read_time = parse(message["read_time"])
 
         data = message.get("data", {})
@@ -35,7 +38,12 @@ class Command(QueueProcessCommand):
         }
 
         result = self.es.index(index="logs", doc_type="line", body=doc)
+        self.client.increment_stat("processed_message")
         percolate_result = self.es.percolate(index="logs", doc_type="line", id=result["_id"])
+
+        if not percolate_result["matches"]:
+            pass
+
         if percolate_result["matches"]:
             live_update_matches = [m["_id"] for m in percolate_result["matches"]
                                    if m["_id"].startswith("lu:")]
@@ -59,6 +67,7 @@ class Command(QueueProcessCommand):
                 if new_names:
                     doc["data"]["event"].extend(new_names)
                     updated_result = self.es.index("logs", "line", doc, id=search_id)
+                    self.client.increment_stat("got_event_hit")
 
                     # Check to see if it matches any new percolators
                     new_percolate_result = self.es.percolate(index="logs", doc_type="line", id=search_id)
@@ -85,7 +94,7 @@ class Command(QueueProcessCommand):
     def get_formats(self, file_name):
         if file_name not in self.format_cache:
             self.format_cache[file_name] = [f.create_format()
-                                       for f in Format.objects.filter(files__name=file_name)
+                                            for f in Format.objects.filter(files__name=file_name)
                                                               .exclude(splitter=None).all()]
         return self.format_cache[file_name]
 
@@ -96,7 +105,7 @@ class Command(QueueProcessCommand):
                     # ToDo: Support multiple events with the same query hash
                     self.event_cache[id] = EventQuery.objects.get(percolate_hash=id)
                 except EventQuery.DoesNotExist:
-                    self.event_cache[id] = None
+                    return None #self.event_cache[id] = None
 
         return [self.event_cache[id]
                 for id in ids

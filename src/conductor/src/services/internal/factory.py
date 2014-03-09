@@ -10,4 +10,5 @@ class InternalServiceFactory(TTwisted.ThriftServerFactory):
         self.websocket_factory = kwargs.pop("websocket_factory")
         self.daemon_service_factory = kwargs.pop("daemon_service_factory")
         self.queue_factory = kwargs.pop("queue_factory")
+        self.stats = kwargs.pop("stats")
         TTwisted.ThriftServerFactory.__init__(self, *args, **kwargs)

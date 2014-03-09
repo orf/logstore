@@ -5,6 +5,7 @@ from twisted.internet import defer
 class LiveUpdateProtocol(WampServerProtocol):
     def __init__(self):
         self.query_hash = None
+        self.watched_stats = []
 
     @exportRpc
     @defer.inlineCallbacks
@@ -24,7 +25,7 @@ class LiveUpdateProtocol(WampServerProtocol):
     def onSessionOpen(self):
         print "Session open"
         self.registerForRpc(self, "logbook/update#")
-        self.registerForPubSub("logbook/live/install/", prefixMatch=True, pubsub=self.SUBSCRIBE)
+        self.registerForPubSub("logbook/stat/", prefixMatch=True, pubsub=self.SUBSCRIBE)
 
     @defer.inlineCallbacks
     def connectionLost(self, reason):

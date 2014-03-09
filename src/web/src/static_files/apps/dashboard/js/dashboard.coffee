@@ -1,7 +1,10 @@
 
-global_message_rates = (0 for num in [0..29])
+messages =
+  global_message_rates: (0 for num in [0..29])
+  event_rates: (0 for num in [0..29])
+  processed_message: (0 for num in [0..29])
 
-console.log(global_message_rates)
+
 $(document).ready ->
   ab.connect("ws://localhost:6062",
                 gotWebSocketConnection,
@@ -14,16 +17,25 @@ gotWebSocketConnection = (session) ->
   console.log "Subscribed"
   session.subscribe(
     "logbook/stat/got_log_line"
-    (uri, event) -> ($("#messages_per_sec").text(event); updateMessageSpeedGraph(event))
+    (uri, event) -> updateSpeedGraph("global_message_rates", event)
+    (error, desc) -> console.log "Error: " + error + " Desc: " + desc
+  )
+  session.subscribe(
+    "logbook/stat/got_event_hit"
+    (uri, event) -> updateSpeedGraph("event_rates", event)
+    (error, desc) -> console.log "Error: " + error + " Desc: " + desc
+  )
+  session.subscribe(
+    "logbook/stat/processed_message"
+    (uri, event) -> updateSpeedGraph("processed_message", event)
     (error, desc) -> console.log "Error: " + error + " Desc: " + desc
   )
 
-updateMessageSpeedGraph = (message_rate) ->
-  global_message_rates.push(message_rate)
+updateSpeedGraph = (name, message_rate) ->
+  messages[name].push(message_rate)
 
-  if global_message_rates.length > 30
-    global_message_rates = global_message_rates.slice(1, 31)
+  if messages[name].length > 30
+    messages[name] = messages[name].slice(1, 31)
 
-  console.log(global_message_rates)
-
-  $("#message_rate_graph").sparkline(global_message_rates)
+  $("##{ name }_graph").sparkline(messages[name])
+  $("##{ name }_text").text(message_rate)

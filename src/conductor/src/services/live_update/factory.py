@@ -40,11 +40,16 @@ class LiveUpdateFactory(WampServerFactory):
 
     def __init__(self, *args, **kwargs):
         self.percolators = defaultdict(int)
+        self.stat_watchers = defaultdict(int)
+        self.stats = kwargs.pop("stats")
         WampServerFactory.__init__(self, *args, **kwargs)
+        self.stats.global_watch(self.stat_watcher)
+
+    def stat_watcher(self, name, value):
+        self.dispatch("logbook/stat/%s" % name, value)
 
     @defer.inlineCallbacks
     def remove_client(self, query_hash):
-
         if query_hash in self.percolators:
             self.percolators[query_hash] -= 1
 
@@ -120,7 +125,3 @@ class LiveUpdateFactory(WampServerFactory):
                                         "search_id": search_id
                                     }
                                 })
-
-    def notify_server_connected(self, token, server_id, server_ip):
-        log.msg("Sending notification of server connection. Token: %s ID: %s IP: %s" % (token, server_id, server_ip))
-        self.dispatch("logbook/live/install/%s" % token, {"id": server_id, "ip": server_ip})

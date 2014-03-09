@@ -28,6 +28,8 @@ class ConductorServiceHandler(object):
             )
         )
 
+        self.factory.stats.increment_stat("got_log_line")
+
         return True
 
     # Batch operations:

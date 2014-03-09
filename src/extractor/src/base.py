@@ -70,6 +70,14 @@ class Field(object):
         if get_transform_list:
             return transform_list
 
+        # Update the type
+        if self.type:
+            self.set_from_path(
+                returner,
+                path,
+                self.type(self.get_from_path(returner, path))
+            )
+
         return returner
         #return {self.name: token.get_data(type=self.type)}  #self.type(token) if self.type else token}
 
