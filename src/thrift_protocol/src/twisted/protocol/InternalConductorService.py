@@ -54,6 +54,13 @@ class Iface(Interface):
     """
     pass
 
+  def increment_stat(stat_name):
+    """
+    Parameters:
+     - stat_name
+    """
+    pass
+
 
 class Client(object):
   implements(Iface)
@@ -190,6 +197,23 @@ class Client(object):
     args.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
+  def increment_stat(self, stat_name):
+    """
+    Parameters:
+     - stat_name
+    """
+    self._seqid += 1
+    self.send_increment_stat(stat_name)
+    return defer.succeed(None)
+
+  def send_increment_stat(self, stat_name):
+    oprot = self._oprot_factory.getProtocol(self._transport)
+    oprot.writeMessageBegin('increment_stat', TMessageType.CALL, self._seqid)
+    args = increment_stat_args()
+    args.stat_name = stat_name
+    args.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
 
 class Processor(TProcessor):
   implements(Iface)
@@ -201,6 +225,7 @@ class Processor(TProcessor):
     self._processMap["create_event"] = Processor.process_create_event
     self._processMap["remove_event"] = Processor.process_remove_event
     self._processMap["percolator_hit"] = Processor.process_percolator_hit
+    self._processMap["increment_stat"] = Processor.process_increment_stat
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -269,6 +294,13 @@ class Processor(TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     d = defer.maybeDeferred(self._handler.percolator_hit, args.logline, args.time, args.server_id, args.file_name, args.hits, args.search_id)
+    return d
+
+  def process_increment_stat(self, seqid, iprot, oprot):
+    args = increment_stat_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    d = defer.maybeDeferred(self._handler.increment_stat, args.stat_name)
     return d
 
 
@@ -822,6 +854,78 @@ class percolator_hit_args(object):
     if self.search_id is not None:
       oprot.writeFieldBegin('search_id', TType.STRING, 6)
       oprot.writeString(self.search_id.encode('utf-8'))
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, getattr(self, key))
+      for key in self.__slots__]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    for attr in self.__slots__:
+      my_val = getattr(self, attr)
+      other_val = getattr(other, attr)
+      if my_val != other_val:
+        return False
+    return True
+
+  def __ne__(self, other):
+    return not (self == other)
+
+
+class increment_stat_args(object):
+  """
+  Attributes:
+   - stat_name
+  """
+
+  __slots__ = [ 
+    'stat_name',
+   ]
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'stat_name', None, None, ), # 1
+  )
+
+  def __init__(self, stat_name=None,):
+    self.stat_name = stat_name
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.stat_name = iprot.readString().decode('utf-8')
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('increment_stat_args')
+    if self.stat_name is not None:
+      oprot.writeFieldBegin('stat_name', TType.STRING, 1)
+      oprot.writeString(self.stat_name.encode('utf-8'))
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

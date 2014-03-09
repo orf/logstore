@@ -30,5 +30,8 @@ service InternalConductorService {
 
     // Notifies the conductor of a percolator(s) hit
     oneway void percolator_hit(1:string logline, 2:string time, 3:i32 server_id,
-                               4:string file_name, 5:set<string> hits, 6:string search_id)
+                               4:string file_name, 5:set<string> hits, 6:string search_id),
+
+    // Increment a counter
+    oneway void increment_stat(1:string stat_name)
 }

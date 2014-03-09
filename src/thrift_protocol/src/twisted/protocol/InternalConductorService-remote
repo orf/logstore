@@ -27,6 +27,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  string create_event(Event event)'
   print '  bool remove_event(string percolate_id)'
   print '  void percolator_hit(string logline, string time, i32 server_id, string file_name,  hits, string search_id)'
+  print '  void increment_stat(string stat_name)'
   print ''
   sys.exit(0)
 
@@ -101,6 +102,12 @@ elif cmd == 'percolator_hit':
     print 'percolator_hit requires 6 args'
     sys.exit(1)
   pp.pprint(client.percolator_hit(args[0],args[1],eval(args[2]),args[3],eval(args[4]),args[5],))
+
+elif cmd == 'increment_stat':
+  if len(args) != 1:
+    print 'increment_stat requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.increment_stat(args[0],))
 
 else:
   print 'Unrecognized method %s' % cmd
