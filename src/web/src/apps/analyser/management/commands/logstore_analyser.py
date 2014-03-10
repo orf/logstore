@@ -1,7 +1,8 @@
-from ._base import QueueProcessCommand
 from logstore.web.apps.formats.models import Format
 from logstore.web.apps.events.models import EventQuery
 from dateutil.parser import parse
+
+from ._base import QueueProcessCommand
 
 
 class Command(QueueProcessCommand):
@@ -41,12 +42,10 @@ class Command(QueueProcessCommand):
         self.client.increment_stat("processed_message")
         percolate_result = self.es.percolate(index="logs", doc_type="line", id=result["_id"])
 
-        if not percolate_result["matches"]:
-            pass
+        # ToDo: Refactor this to handle events first, then handle live updates.
 
         if percolate_result["matches"]:
-            live_update_matches = [m["_id"] for m in percolate_result["matches"]
-                                   if m["_id"].startswith("lu:")]
+            live_update_matches = [m["_id"] for m in percolate_result["matches"] if m["_id"].startswith("lu:")]
 
             if live_update_matches:
                 self.notify_live_update(doc, live_update_matches, result["_id"], read_time)

@@ -1,13 +1,6 @@
-import urllib
-import functools
-
-from twisted.internet import defer, reactor, task
+from twisted.internet import defer, reactor
 from twisted.web import client
 from twisted.web.client import HTTPConnectionPool
-from twisted.web.http_headers import Headers
-from cStringIO import StringIO
-from twisted.web.iweb import IBodyProducer
-from zope.interface import implements
 import treq
 
 pool = HTTPConnectionPool(reactor, persistent=True)

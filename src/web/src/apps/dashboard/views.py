@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
+
 from ..statistics.models import get_latest_snapshot
+
 
 # Create your views here.
 class Dashboard(TemplateView):

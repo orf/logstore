@@ -1,6 +1,8 @@
-from .models import Snapshot
 import kronos
 import elasticsearch
+
+from .models import Snapshot
+
 
 @kronos.register("*/5 * * * *")
 def update_statistics():

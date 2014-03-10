@@ -6,10 +6,11 @@
 #  options string: py:slots,utf8strings,new_style
 #
 
-from thrift.Thrift import TType, TMessageType, TException, TApplicationException
+from thrift.Thrift import TType
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol, TProtocol
+from thrift.protocol import TBinaryProtocol
+
 try:
   from thrift.protocol import fastbinary
 except:

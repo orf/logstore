@@ -2,8 +2,8 @@ from django.db import models
 from logstore.extractor.base import Format as ExtractorFormat, Field as ExtractorField, FieldSource
 from logstore.extractor.splitters import Character, Shlex, Regex, DoNothing, Space
 from logstore.extractor.transformers import RemoveTransformer
-from ..analyser.extractor_additions.transformers import GeoIPLookup
 
+from ..analyser.extractor_additions.transformers import GeoIPLookup
 from .choices import SplitterChoice, TypeChoice, TransformChoice
 
 

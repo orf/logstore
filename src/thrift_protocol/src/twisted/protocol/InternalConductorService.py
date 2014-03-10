@@ -6,11 +6,12 @@
 #  options string: py:twisted,slots,utf8strings,new_style
 #
 
-from thrift.Thrift import TType, TMessageType, TException, TApplicationException
-from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol, TProtocol
+from thrift.protocol import TBinaryProtocol
+
+from ttypes import *
+
 try:
   from thrift.protocol import fastbinary
 except:
@@ -18,7 +19,7 @@ except:
 
 from zope.interface import Interface, implements
 from twisted.internet import defer
-from thrift.transport import TTwisted
+
 
 class Iface(Interface):
   def remove_server(server_id):

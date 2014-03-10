@@ -1,7 +1,9 @@
+import os
+
 from logstore.extractor.base import Transformer
 from pygeoip import GeoIP, MEMORY_CACHE
 from django.conf import settings
-import os
+
 
 # Not thread safe, but screw it for now
 lookup = GeoIP(os.path.join(settings.GEOIP_DATABASE_DIR, "GeoIP.dat"), MEMORY_CACHE)

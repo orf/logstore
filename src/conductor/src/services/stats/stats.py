@@ -1,6 +1,7 @@
 from collections import defaultdict
-from twisted.internet import task
 import itertools
+
+from twisted.internet import task
 
 
 class Stats(object):

@@ -7,7 +7,6 @@ from zope.interface import implements
 from twisted.web.iweb import IBodyProducer
 from twisted.internet import defer, reactor
 from twisted.web.client import Agent, HTTPConnectionPool, readBody, Headers
-from twisted.python import log
 
 from.protocol import LiveUpdateProtocol
 

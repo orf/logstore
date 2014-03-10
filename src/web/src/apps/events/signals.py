@@ -1,5 +1,3 @@
-import time
-
 from logstore.thrift_protocol.plain.protocol import InternalConductorService
 from logstore.thrift_protocol.plain.protocol.ttypes import Event
 from django.db.models.signals import post_delete, post_save

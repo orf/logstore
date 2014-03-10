@@ -1,10 +1,11 @@
 # Downloads and extracts
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
 import os
 import gzip
 import urllib
+
+from django.core.management.base import BaseCommand
+from django.conf import settings
 
 
 class Command(BaseCommand):

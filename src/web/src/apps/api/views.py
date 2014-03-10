@@ -1,20 +1,23 @@
 import json
-import cPickle
-import base64
 
 from django.views.generic import View
-from django.views.generic.detail import SingleObjectMixin
 from django.http.response import HttpResponse
-from django.shortcuts import Http404
 from elasticsearch import Elasticsearch
 from django.conf import settings
 
 from ..servers.models import Server
-from ..formats.models import Format
-from ..events.models import Event
 
 
 es = Elasticsearch(settings.ELASTICSEARCH_URL)
+
+
+class GetLogFileNamesView(View):
+    def get(self, *args, **kwargs):
+        results = es.search("logs", "line", {"query": {"match_all": {}},
+                                             "facets": {"file_name": {"terms": {"field": "file_name"}}}}, size=0)
+        return HttpResponse(json.dumps(
+            [x["term"] for x in results["facets"]["file_name"]["terms"]]
+        ), status=200, content_type="text/json")
 
 
 class SearchLogsView(View):

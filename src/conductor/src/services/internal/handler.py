@@ -3,8 +3,6 @@ from zope.interface import implements
 from twisted.internet import defer
 from twisted.python import log
 
-import json
-
 
 class InternalServiceHandler():
     implements(InternalConductorService.Iface)

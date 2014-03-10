@@ -1,14 +1,13 @@
-from django.core.management.base import BaseCommand
-
 import json
+import time
 
+from django.core.management.base import BaseCommand
 from elasticsearch import Elasticsearch
 from logstore.thrift_protocol.plain.protocol import InternalConductorService
 from thrift.transport import TSocket
 from thrift.transport.TTransport import TFramedTransport, TBufferedTransport, TTransportException
 from thrift.protocol import TBinaryProtocol
 import pika
-import time
 
 FORMAT_CACHE = {}
 

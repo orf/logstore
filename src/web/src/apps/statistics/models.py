@@ -1,6 +1,7 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
-import datetime
 
 
 def get_snapshot_datetime():
