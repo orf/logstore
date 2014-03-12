@@ -157,3 +157,5 @@ ELASTICSEARCH_URL = "http://localhost:9200/"
 JS_URLS_NAMESPACES = ["api", "servers"]
 
 GEOIP_DATABASE_DIR = os.path.join(BASE_DIR, "apps", "analyser", "geo_ip")
+
+PUSHBULLET_API_KEY = "581IHLazsXFe12egUsNgd0BDewNVh72A"

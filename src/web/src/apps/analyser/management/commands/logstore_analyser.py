@@ -35,6 +35,7 @@ class Command(QueueProcessCommand):
             "read_time": read_time,
             "server_id": message["server_id"],
             "file_name": message["file_name"],
+            "events": [],
             "data": data
         }
 
@@ -59,12 +60,9 @@ class Command(QueueProcessCommand):
                     self.stdout.write("!", ending="")
                     return
 
-                if "event" not in doc["data"]:
-                    doc["data"]["event"] = []
-
-                new_names = [query.name for query in queries if query.name not in doc["data"]["event"]]
+                new_names = [query.name for query in queries if query.name not in doc["events"]]
                 if new_names:
-                    doc["data"]["event"].extend(new_names)
+                    doc["events"].extend(new_names)
                     updated_result = self.es.index("logs", "line", doc, id=search_id)
                     self.client.increment_stat("got_event_hit")
 

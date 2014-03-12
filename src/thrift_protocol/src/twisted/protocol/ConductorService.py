@@ -7,8 +7,6 @@
 #
 
 from thrift.Thrift import TProcessor
-from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
 
 from ttypes import *
 

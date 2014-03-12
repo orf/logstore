@@ -9,6 +9,7 @@ from thrift.transport.TTransport import TFramedTransport, TBufferedTransport, TT
 from thrift.protocol import TBinaryProtocol
 import pika
 
+
 FORMAT_CACHE = {}
 
 
@@ -41,6 +42,7 @@ class QueueProcessCommand(BaseCommand):
 
     def handle(self, *args, **options):
         self.es = Elasticsearch('http://localhost:9200/')
+        self.create_mappings()
 
         connection = pika.BlockingConnection()
         channel = connection.channel()
@@ -83,25 +85,25 @@ class QueueProcessCommand(BaseCommand):
 
     def create_mappings(self):
         self.es.indices.create("logs", body={
-                "mappings": {
-                    {"line": {
-                        "properties": {
-                            "message": {"type": "string"},
-                            "read_time": {"type": "date"},
+            "mappings": {
+                "line": {
+                    "properties": {
+                        "message": {"type": "string"},
+                        "read_time": {"type": "date"},
+                        "events": {"type": "string"},
 
-                            "data": {
-                                "type": "object"
-                            },
+                        "data": {
+                            "type": "object"
+                        },
 
-                            "server_id": {
-                                "type": "integer",
-                            },
+                        "server_id": {
+                            "type": "integer",
+                        },
 
-                            "file_name": {
-                                "type": "string"
-                            }
+                        "file_name": {
+                            "type": "string",
                         }
-                    }}
+                    }
                 }
             }
-        )
+        })

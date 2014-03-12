@@ -8906,3 +8906,8 @@ th.hide-for-touch {
   padding-top: 12px;
   padding-bottom: 12px;
 }
+
+/* line 6, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/app.scss */
+.buttonHolder > input {
+  margin-right: 20px;
+}

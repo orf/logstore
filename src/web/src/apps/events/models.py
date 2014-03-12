@@ -20,11 +20,14 @@ class EventQuery(models.Model):
     event = models.ForeignKey("events.Event", related_name="queries")
 
     def __unicode__(self):
-        return "<EventQuery: %s / %s / %s>" %(self.name, self.weight, self.query)
+        return '%s  Weight: %s  Query: "%s"' % (self.name, self.weight, self.query)
+
+    def get_file_name_query(self, postfix=""):
+        names = self.event.files.values_list("name")
+        if not names:
+            return ""
+        return " OR ".join('(file_name:"%s")' % name for name in names) + postfix
 
     def get_query(self):
-        names, prefix = self.event.files.values_list("name"), ""
-
-        if names:
-            prefix = "%s AND" % (" OR ".join('(file_name:"%s")' % name for name in names))
-        return "%s (%s)" % (prefix, self.query)
+        prefix = self.get_file_name_query(postfix=" AND ")
+        return "%s(%s)" % (prefix, self.query)

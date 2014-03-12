@@ -2,3 +2,7 @@
 @import "search";
 @import "forms/add_server_form";
 @import "logbook";
+
+.buttonHolder > input {
+  margin-right: 20px;
+}
