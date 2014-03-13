@@ -42,7 +42,10 @@ class QueueProcessCommand(BaseCommand):
 
     def handle(self, *args, **options):
         self.es = Elasticsearch('http://localhost:9200/')
-        self.create_mappings()
+        try:
+            self.create_mappings()
+        except Exception:
+            pass
 
         connection = pika.BlockingConnection()
         channel = connection.channel()

@@ -5,8 +5,8 @@ set DIST_DIR=%CD%\dist\
 rm -r -f %DIST_DIR%
 mkdir %DIST_DIR%
 
-FOR /f %%d in ('dir /b src\') do (
-    pushd "src/%%d"
+FOR /f %%d in ('dir /b /S src\ ^| grep setup.py') do (
+    pushd %%~dpd
     python setup.py build --build-base=%BUILD_DIR% sdist --formats=gztar
     cp dist\* %DIST_DIR% -f
     rm -r -f dist

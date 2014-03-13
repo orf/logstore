@@ -66,7 +66,7 @@ class PushBulletContact(AlertContact):
     def notify(self, current_value, triggered_condition):
         pushbullet.Device(settings.PUSHBULLET_API_KEY, self.device_id)\
             .push_note("Alert %s has been triggered" % self.alert.name,
-                       "Logstore event %s has a value of %s" % (self.condition.event.name, current_value))
+                       "Logstore event %s has a value of %s" % (triggered_condition.event_query.name, current_value))
 
 
 class AlertCondition(models.Model):
@@ -74,7 +74,7 @@ class AlertCondition(models.Model):
     event_query = models.ForeignKey("events.EventQuery", related_name="alerts")
     time_value = models.PositiveIntegerField()
     time_choice = models.IntegerField(choices=TimeSpanChoice, default=TimeSpanChoice.MINUTES)
-    last_triggered = models.DateTimeField(auto_now_add=True)
+    next_trigger = models.DateTimeField(auto_now_add=True)
 
     objects = SelectSubclassManager()
 
@@ -98,25 +98,22 @@ class AlertCondition(models.Model):
     def get_trigger_value(self, started, es):
         raise NotImplementedError()
 
-    def get_range_query(self, started):
-        return {"range": {"read_time": {"lte": started, "gte": started - self.get_timespan()}}}
+    def get_query(self, started, filter_by_event=True):
+        qs = self.event_query.get_file_name_query(postfix=" AND " if filter_by_event else "")
+        if filter_by_event:
+            qs += "events:'%s'" % self.event_query.name
 
-    def get_query_string(self):
-        return {"query_string": {"query": "%sevents:'%s'" % (self.event_query.get_file_name_query(postfix=" AND "),
-                                                             self.event_query.name)}}
-
-    def get_query(self, started):
         return {
             "bool": {
                 "must": [
-                    self.get_query_string(),
-                    self.get_range_query(started)
+                    {"query_string": {"query": qs}},
+                    {"range": {"read_time": {"lte": started, "gte": started - self.get_timespan()}}}
                 ]
             }
         }
 
-    def get_current_value(self, started, es):
-        return es.count("logs", "line", {"query": self.get_query(started)})["count"]
+    def get_current_value(self, started, es, query=None):
+        return es.count("logs", "line", {"query": self.get_query(started) if query is None else query})["count"]
 
 
 class EventCountCondition(AlertCondition):
@@ -143,12 +140,8 @@ class EventPercentageCondition(AlertCondition):
     percentage = models.PositiveSmallIntegerField(validators=[MaxValueValidator(100)])
 
     def get_trigger_value(self, started, es):
-        # The default get_current_value returns the current count of the
-        return self.percentage
+        total_lines = self.get_current_value(started, es, query=self.get_query(started, filter_by_event=False))
+        return (total_lines / 100) * self.percentage
 
-    def check_triggered(self, started, es):
-        current_value = self.get_current_value(started, es)
-        trigger_value = self.get_trigger_value(started, es)
-        return (current_value / trigger_value * 100) >= trigger_value, trigger_value, current_value
-
-
+    def description(self):
+        return "More than %s%% of messages are %s" % (self.percentage, self.event_query.name)

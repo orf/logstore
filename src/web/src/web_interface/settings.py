@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 sys.path.append(os.path.join(BASE_DIR, ".."))
@@ -57,6 +58,8 @@ INSTALLED_APPS = (
     'apps.analyser',
     'apps.statistics',
     'apps.alerts',
+
+    'logstore.ext.geoip',
 
     'kronos',
     'djangojs',
@@ -156,6 +159,6 @@ ELASTICSEARCH_URL = "http://localhost:9200/"
 
 JS_URLS_NAMESPACES = ["api", "servers"]
 
-GEOIP_DATABASE_DIR = os.path.join(BASE_DIR, "apps", "analyser", "geo_ip")
-
 PUSHBULLET_API_KEY = "581IHLazsXFe12egUsNgd0BDewNVh72A"
+
+GEOIP_DATABASE_DIR = os.path.join(BASE_DIR, ".cache")

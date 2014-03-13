@@ -24,5 +24,4 @@ setup(name="logstore.web",
           "elasticsearch",
           "psycopg2",
           "ipaddr",
-          "pygeoip",
           "pytz"])
