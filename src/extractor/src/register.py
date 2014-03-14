@@ -18,13 +18,13 @@ class Registry(object):
 
     def add_transformer(self, name, display_name=None):
         def _register(cls):
-            self.transformers[name] = RegistryEntry(display_name or name, cls)
+            self.transformers[name] = RegistryEntry(display_name or name.capitalize(), cls)
             return cls
         return _register
 
     def add_type(self, name, display_name=None):
         def _register(cls):
-            self.types[name] = RegistryEntry(display_name or name, cls)
+            self.types[name] = RegistryEntry(display_name or name.capitalize(), cls)
             return cls
         return _register
 
@@ -32,10 +32,10 @@ class Registry(object):
         return [(name, item.name) for name, item in self.transformers.items()]
 
     def get_splitter_choices(self):
-        return [(name, item.name) for name, item in self.transformers.items()]
+        return [(name, item.name) for name, item in self.splitters.items()]
 
     def get_type_choices(self):
-        return [(name, item.name) for name, item in self.transformers.items()]
+        return [(name, item.name) for name, item in self.types.items()]
 
     def get_splitter_by_name(self, name):
         return self.splitters[name].cls

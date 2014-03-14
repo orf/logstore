@@ -19,7 +19,7 @@ class FormatFile(models.Model):
 
 
 class Splitter(models.Model):
-    type = models.TextField(choices=registry.get_splitter_choices())
+    type = models.CharField(choices=registry.get_splitter_choices(), max_length=255)
     args = models.CharField(max_length=250, null=True, blank=True)
     format = models.OneToOneField("formats.Format")
 
@@ -48,7 +48,7 @@ class Field(models.Model):
 
 
 class Transform(models.Model):
-    type = models.TextField(choices=registry.get_transformer_choices())
+    type = models.CharField(choices=registry.get_transformer_choices(), max_length=255)
     args = models.CharField(max_length=250, blank=True)
     field = models.ForeignKey("formats.Field", related_name="transformations")
 
