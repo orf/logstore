@@ -90,14 +90,18 @@ class Field(object):
         return r
 
 
+class SourceTemplate(Template):
+    idpattern = "[0-9]*" # Only numbers
+
+
 class FieldSource(object):
     def __init__(self, expr):
         if expr.isdigit():  # It supports just specifying a index
             expr = "$" + expr
-        self.template = Template(expr)
+        self.template = SourceTemplate(expr)
 
     def get_token(self, tokens):
-        return self.template.safe_substitute(**{idx:token for idx, token in enumerate(tokens)})
+        return self.template.safe_substitute(**{str(idx): token for idx, token in enumerate(tokens)})
 
 
 class Transformer(object):
