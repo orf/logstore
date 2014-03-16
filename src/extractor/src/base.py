@@ -1,13 +1,4 @@
-
-"""
-Example Data:
------------------------------------------------------------------
-Pinging google.com [83.100.221.240] with 32 bytes of data:
-Request timed out.
-Reply from 83.100.221.240: bytes=32 time=289ms TTL=60
-Reply from 83.100.221.240: bytes=32 time=35ms TTL=60
-64.242.88.10 - - [07/Mar/2004:16:05:49 -0800] "GET /twiki/bin/edit/Main/Double_bounce_sender?topicparent=Main.ConfigurationVariables HTTP/1.1" 401 12846
-"""
+from string import Template
 
 
 class Format(object):
@@ -100,15 +91,19 @@ class Field(object):
 
 
 class FieldSource(object):
-    def __init__(self, source):
-        self.source = source
+    def __init__(self, expr):
+        if expr.isdigit():  # It supports just specifying a index
+            expr = "$" + expr
+        self.template = Template(expr)
 
     def get_token(self, tokens):
-        sources = self.source.split(",")
-        return "".join([tokens[int(i.strip())] for i in sources])
+        return self.template.substitute(**{idx:token for idx, token in enumerate(tokens)})
 
 
 class Transformer(object):
+    def __init__(self, *args):
+        pass
+
     def transform(self, value):
         raise NotImplementedError()
 

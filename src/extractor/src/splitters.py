@@ -21,7 +21,7 @@ class Space(CharSplitter):
 @registry.add_splitter("shlex")
 class Shlex(Splitter):
     def split(self, message):
-        return shlex.split(message)
+        return shlex.split(message, posix=True)
 
 
 @registry.add_splitter("regex")
