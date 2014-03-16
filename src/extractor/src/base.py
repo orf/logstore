@@ -97,7 +97,7 @@ class FieldSource(object):
         self.template = Template(expr)
 
     def get_token(self, tokens):
-        return self.template.substitute(**{idx:token for idx, token in enumerate(tokens)})
+        return self.template.safe_substitute(**{idx:token for idx, token in enumerate(tokens)})
 
 
 class Transformer(object):
