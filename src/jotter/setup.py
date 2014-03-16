@@ -10,7 +10,8 @@ setup(name="logstore.jotter",
       namespace_packages =["logstore"],
       packages=["logstore.jotter"] + ["logstore.jotter." + p for p in find_packages("src")],
       install_requires=["logstore.thrift_protocol",
-                        "twisted==13.2.0"],
+                        "twisted==13.2.0",
+                        "dateutil"],
       entry_points={
           "console_scripts": [
               "jotter = logstore.jotter.jotter:main"

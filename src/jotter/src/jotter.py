@@ -10,6 +10,7 @@ from twisted.protocols import basic
 from thrift.transport import TTwisted
 from thrift.protocol import TBinaryProtocol
 from zope.interface import implements
+from dateutil.tz import tzlocal
 
 
 class Options(usage.Options):
@@ -66,7 +67,7 @@ class StandardInputForwarder(basic.LineReceiver):
         if line:
             self.queue.append(
                 LogLine(file_name=self.file_name,
-                        read_time=datetime.datetime.now().isoformat(),
+                        read_time=datetime.datetime.now(tz=tzlocal()).isoformat(),
                         log_line=line)
             )
 
