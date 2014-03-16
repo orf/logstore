@@ -14,4 +14,6 @@ class UserAgentTransformer(Transformer):
             parsed = {"os": os, "browser": browser}
         else:
             parsed = httpagentparser.detect(value)
-        return {"raw": value}.update(parsed), "raw"
+        returner = {"raw": value}
+        returner.update(parsed)
+        return returner, "raw"

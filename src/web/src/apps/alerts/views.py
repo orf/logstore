@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404
 
 from .models import Alert, AlertCondition, AlertContact
 from .forms import AddAlertForm, AddAlertConditionEventTriggeredForm, AddAlertConditionBucketCountForm,\
-    AddAlertEmailContactForm, AddAlertTextContactForm, AddAlertPushBulletContactForm, AddAlertConditionPercentageForm
+    AddAlertEmailContactForm, AddAlertTextContactForm, AddAlertPushBulletContactForm, AddAlertConditionPercentageForm,\
+    AddAlertConditionStatsForm
 
 
 class AlertMixin(object):
@@ -39,6 +40,7 @@ class AddAlertCondition(AlertMixin, CreateView):
     def get_form_class(self):
         return {"count": AddAlertConditionBucketCountForm,
                 "trigger": AddAlertConditionEventTriggeredForm,
+                "stats": AddAlertConditionStatsForm,
                 "percentage": AddAlertConditionPercentageForm}[self.kwargs["condition_type"]]
 
     def form_valid(self, form):
@@ -66,7 +68,7 @@ class AddContactView(AlertMixin, CreateView):
         return {
             "email": AddAlertEmailContactForm,
             "text": AddAlertTextContactForm,
-            "push": AddAlertPushBulletContactForm
+            "push": AddAlertPushBulletContactForm,
         }[self.kwargs["contact_type"]]
 
     def form_valid(self, form):

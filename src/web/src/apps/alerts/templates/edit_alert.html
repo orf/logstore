@@ -24,7 +24,7 @@
                 <tbody>
                     {% for condition in alert.conditions.all %}
                         <tr>
-                            <td>{{ condition.event_query.name }}</td>
+                            <td>{{ condition.name }}</td>
                             <td>{{ condition.description }}</td>
                             <td>
                                 <form method="POST" action="{% url "alerts:delete_condition" alert.id condition.id %}">

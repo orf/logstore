@@ -26,8 +26,8 @@ class Command(QueueProcessCommand):
         for format in formats:
             try:
                 data.update(format.process(message["log_message"]))
-            except Exception:
-                #print e
+            except Exception, e:
+                print e
                 pass
 
         doc = {

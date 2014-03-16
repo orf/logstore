@@ -5,7 +5,7 @@ from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, 
 import pushbullet
 
 from .models import Alert, EventTriggeredCondition, EventCountCondition, EventPercentageCondition,\
-    EmailContact, PushBulletContact, TextContact
+    EmailContact, PushBulletContact, TextContact, StatisticalValueCondition
 
 
 class BaseModelForm(forms.ModelForm):
@@ -69,6 +69,28 @@ class AddAlertConditionPercentageForm(BaseModelForm):
     class Meta:
         model = EventPercentageCondition
         fields = ("event_query", "percentage", "time_value", "time_choice")
+
+
+class AddAlertConditionStatsForm(BaseModelForm):
+    def get_title(self):
+        return "Add a statistic condition"
+
+    def get_fieldset_content(self):
+        return (
+            Row(Column('format_field')),
+            Row(
+                Column("statistic", css_class="small-6"),
+                Column("value", css_class="small-6")
+            ),
+            Row(
+                Column("time_value", css_class="small-6"),
+                Column("time_choice", css_class="small-6")
+            )
+        )
+
+    class Meta:
+        model = StatisticalValueCondition
+        fields = ("format_field", "statistic", "value", "time_value", "time_choice")
 
 
 class AddAlertConditionBucketCountForm(BaseModelForm):

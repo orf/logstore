@@ -21,12 +21,13 @@ def test_alerts():
         print " - Testing alert %s" % alert.name
 
         for condition in alert.conditions.filter(next_trigger__lte=started).all():
-            print "  - Testing condition for %s" % condition.event_query.name
+            print "  - Testing condition for %s" % condition.name()
             triggered, trigger_value, current_value = condition.check_triggered(started, es)
+            print trigger_value, current_value
             if triggered:
                 print "   - Condition fired - %s" % current_value
                 # Update the last triggered time
-                condition.next_trigger = started + condition.get_timespan()
-                condition.save()
-
                 alert.notify(current_value, condition)
+
+            condition.next_trigger = started + condition.get_timespan()
+            condition.save()

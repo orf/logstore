@@ -4,7 +4,7 @@ import httpagentparser
 
 
 @registry.add_transformer("http_request", "HTTP Request")
-class UserAgentTransformer(Transformer):
+class HttpRequestTransformer(Transformer):
     def __init__(self, args):
         self.args = args
 

@@ -9,7 +9,7 @@ from model_utils.managers import InheritanceManager
 from django.conf import settings
 import pushbullet
 
-from .choices import TimeSpanChoice
+from .choices import TimeSpanChoice, StatisticalChoice
 
 
 class SelectSubclassManager(InheritanceManager):
@@ -71,12 +71,16 @@ class PushBulletContact(AlertContact):
 
 class AlertCondition(models.Model):
     alert = models.ForeignKey("alerts.Alert", related_name="conditions")
-    event_query = models.ForeignKey("events.EventQuery", related_name="alerts")
+    event_query = models.ForeignKey("events.EventQuery", related_name="alerts", null=True)
+    format_field = models.ForeignKey("formats.Field", related_name="alerts", null=True)
     time_value = models.PositiveIntegerField()
     time_choice = models.IntegerField(choices=TimeSpanChoice, default=TimeSpanChoice.MINUTES)
     next_trigger = models.DateTimeField(auto_now_add=True)
 
     objects = SelectSubclassManager()
+
+    def name(self):
+        return self.event_query.name
 
     def description(self):
         raise NotImplementedError()
@@ -98,22 +102,30 @@ class AlertCondition(models.Model):
     def get_trigger_value(self, started, es):
         raise NotImplementedError()
 
+    def get_file_filter(self, postfix=""):
+        if self.event_query_id:
+            return self.event_query.get_file_name_query(postfix)
+        else:
+            return self.format_field.format.get_file_name_query(postfix)
+
     def get_query(self, started, filter_by_event=True):
-        qs = self.event_query.get_file_name_query(postfix=" AND " if filter_by_event else "")
+        qs = self.get_file_filter(postfix=" AND " if filter_by_event else "")
         if filter_by_event:
             qs += "events:'%s'" % self.event_query.name
 
         return {
-            "bool": {
-                "must": [
-                    {"query_string": {"query": qs}},
-                    {"range": {"read_time": {"lte": started, "gte": started - self.get_timespan()}}}
-                ]
+            "query": {
+                "bool": {
+                    "must": [
+                        {"query_string": {"query": qs}},
+                        {"range": {"read_time": {"lte": started, "gte": started - self.get_timespan()}}}
+                    ]
+                }
             }
         }
 
-    def get_current_value(self, started, es, query=None):
-        return es.count("logs", "line", {"query": self.get_query(started) if query is None else query})["count"]
+    def get_current_value(self, started, es, query=None, key=""):
+        return es.count("logs", "line", self.get_query(started) if query is None else query)["count"]
 
 
 class EventCountCondition(AlertCondition):
@@ -134,6 +146,33 @@ class EventTriggeredCondition(AlertCondition):
     def description(self):
         return "A single %s event, triggered every %s %s" % (self.event_query.name, self.time_value,
                                                              self.get_time_choice_display())
+
+
+class StatisticalValueCondition(AlertCondition):
+    statistic = models.CharField(choices=StatisticalChoice, max_length=255)
+    value = models.IntegerField()
+
+    def get_trigger_value(self, started, es):
+        return self.value
+
+    def get_query(self, started, filter_by_event=False):
+        query = super(StatisticalValueCondition, self).get_query(started, filter_by_event)
+        query["facets"] = {"average": {"statistical": {"field": "data.%s" % self.format_field.name}}}
+        return query
+
+    def get_current_value(self, started, es, query=None, key=""):
+        return es.search("logs",
+                         "line",
+                         self.get_query(started) if query is None else query,
+                         size=0)["facets"]["average"][self.statistic]
+
+    def description(self):
+        return "%s with an %s value above %s every %s %s" % (self.format_field.name, self.get_statistic_display(),
+                                                             self.value, self.time_value,
+                                                             self.get_time_choice_display())
+
+    def name(self):
+        return self.format_field.name
 
 
 class EventPercentageCondition(AlertCondition):
