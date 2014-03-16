@@ -21,6 +21,7 @@ class Command(QueueProcessCommand):
         read_time = parse(message["read_time"])
 
         data = message.get("data", {})
+        data.update({"read_time": read_time})
         formats = self.get_formats(message["file_name"])
 
         for format in formats:
@@ -32,9 +33,8 @@ class Command(QueueProcessCommand):
 
         doc = {
             "message": message["log_message"],
-            "read_time": read_time,
             "server_id": message["server_id"],
-            "file_name": message["file_name"],
+            "stream_name": message["file_name"],
             "events": [],
             "data": data
         }

@@ -15,7 +15,7 @@ class String(unicode):
 
 def generic_datetime_type(value, type):
     if isinstance(value, basestring):
-        return parser.parse(value)
+        return parser.parse(value, fuzzy=True)
     elif not isinstance(value, type):
         raise ValueError("Value %s is not a %s" % (value, type.__name__))
     return value

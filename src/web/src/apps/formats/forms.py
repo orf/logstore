@@ -52,7 +52,7 @@ class FieldForm(forms.ModelForm):
         self.helper.layout = Layout(
             Fieldset(
                 'Add Field',
-                "name", "type", "source_index"
+                "name", "type", "source_template"
             ),
             ButtonHolder(Submit('submit', 'Submit', css_class="small"))
         )
@@ -63,7 +63,7 @@ class FieldForm(forms.ModelForm):
 
     class Meta:
         model = Field
-        fields = ("name", "type", "source_index")
+        fields = ("name", "type", "source_template")
 
 
 class TransformForm(forms.ModelForm):
@@ -87,8 +87,8 @@ class TransformForm(forms.ModelForm):
         fields = ("type", "args")
 
 
-class FormatFilesForm(forms.Form):
-    files = forms.CharField(max_length=1024)
+class FormatStreamsForm(forms.Form):
+    streams = forms.CharField(max_length=1024)
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
@@ -96,11 +96,8 @@ class FormatFilesForm(forms.Form):
         self.helper.layout = Layout(
             Fieldset(
                 'Edit Files',
-                "files"
+                "streams"
             ),
             ButtonHolder(Submit('submit', 'Submit', css_class="small"))
         )
-
-        if "instance" in kwargs and kwargs["instance"] is not None:
-            self.helper.layout.fields[0].legend = "Modify Transformation"
-        super(FormatFilesForm, self).__init__(*args, **kwargs)
+        super(FormatStreamsForm, self).__init__(*args, **kwargs)

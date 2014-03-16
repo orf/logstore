@@ -32,8 +32,8 @@
                     <tr>
                         <td>{{ obj.name }}</td>
                         <td>
-                            {% for file in obj.files.all %}
-                                {{ file.name }}<br/>
+                            {% for stream in obj.streams.all %}
+                                {{ stream.name }}<br/>
                             {% endfor %}
                         </td>
                         <td class="actions_column">

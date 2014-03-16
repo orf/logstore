@@ -3,8 +3,8 @@ from django.views.generic.base import ContextMixin
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
 
-from .models import Format, Splitter, Field, Transform, FormatFile
-from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm, FormatFilesForm
+from .models import Format, Splitter, Field, Transform, FormatStream
+from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm, FormatStreamsForm
 
 
 class FormatMixin(ContextMixin):
@@ -114,31 +114,31 @@ class AddTransformationView(FormatMixin, UpdateView):
                                                           self.object.field_id])
 
 
-class EditFormatFilesView(FormatMixin, SingleObjectMixin, FormView):
-    form_class = FormatFilesForm
-    template_name = "edit_format_files.html"
+class EditFormatStreamsView(FormatMixin, SingleObjectMixin, FormView):
+    form_class = FormatStreamsForm
+    template_name = "edit_format_streams.html"
     model = Format
     pk_url_kwarg = "format_id"
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(EditFormatFilesView, self).dispatch(request, *args, **kwargs)
+        return super(EditFormatStreamsView, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         return {
-            "files": ", ".join((f.name for f in self.object.files.all()))
+            "streams": ", ".join((s.name for s in self.object.streams.all()))
         }
 
     def form_valid(self, form):
-        files = set(x.strip() for x in form.cleaned_data["files"].split(","))
+        streams = set(x.strip() for x in form.cleaned_data["streams"].split(","))
 
-        self.object.files.all().delete()
+        self.object.streams.all().delete()
 
-        FormatFile.objects.bulk_create(
-            [FormatFile(name=n, format=self.object) for n in files]
+        FormatStream.objects.bulk_create(
+            [FormatStream(name=n, format=self.object) for n in streams]
         )
 
-        return super(EditFormatFilesView, self).form_valid(form)
+        return super(EditFormatStreamsView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy("formats:edit", args=[self.get_object().id])

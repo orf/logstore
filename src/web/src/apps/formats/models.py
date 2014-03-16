@@ -21,15 +21,15 @@ class Format(models.Model):
         )
 
     def get_file_name_query(self, postfix=""):
-        names = self.files.values_list("name")
+        names = self.streams.values_list("name")
         if not names:
             return ""
-        return " OR ".join('(file_name:"%s")' % name for name in names) + postfix
+        return " OR ".join('(stream_name:"%s")' % name for name in names) + postfix
 
 
-class FormatFile(models.Model):
+class FormatStream(models.Model):
     name = models.CharField(max_length=250)
-    format = models.ForeignKey("formats.Format", related_name="files")
+    format = models.ForeignKey("formats.Format", related_name="streams")
 
 
 class Splitter(models.Model):
@@ -44,13 +44,13 @@ class Splitter(models.Model):
 class Field(models.Model):
     name = models.CharField(max_length=100, validators=[no_spaces])
     type = models.CharField(choices=registry.get_type_choices(), max_length=255)
-    source_index = models.CharField(max_length=255)
+    source_template = models.CharField(max_length=255)
     format = models.ForeignKey("formats.Format", related_name="fields")
 
     def get_field(self):
         return ExtractorField(
             name=self.name,
-            source=FieldSource(self.source_index),
+            source=FieldSource(self.source_template),
             transformers=[
                 t.get_transformer() for t in self.transformations.all()
             ],

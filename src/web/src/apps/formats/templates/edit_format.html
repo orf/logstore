@@ -15,15 +15,15 @@
                     <a href="{% url "formats:edit_splitter" format.id %}">Define a splitter</a>
                 {% endif %}
                 <br/><br/>
-                <strong>Files:</strong>
-                {% if format.files.count %}
-                    <a href="{% url "formats:edit_files" format.id %}">
-                        {% for file in format.files.all %}
-                            {{ file.name }}{% if not forloop.last %}, {% endif %}
+                <strong>Streams:</strong>
+                {% if format.streams.count %}
+                    <a href="{% url "formats:edit_streams" format.id %}">
+                        {% for stream in format.streams.all %}
+                            {{ stream.name }}{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </a>
                 {% else %}
-                    <a href="{% url "formats:edit_files" format.id %}">Specify files</a>
+                    <a href="{% url "formats:edit_streams" format.id %}">Specify streams</a>
                 {% endif %}
             </div>
         </div>
@@ -44,7 +44,7 @@
                         <tr>
                             <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
                             <td>{{ field.get_type_display }}</td>
-                            <td>{{ field.source_index }}</td>
+                            <td>{{ field.source_template }}</td>
                         </tr>
                     {% endfor %}
 
