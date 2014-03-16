@@ -1,4 +1,5 @@
 from string import Template
+from . import args
 
 
 class Format(object):
@@ -44,7 +45,11 @@ class Field(object):
             transform_list = []
 
         for transformer in self.transformers:
-            new_token, new_path = transformer.transform(token)
+            try:
+                new_token, new_path = transformer.transform(token)
+            except Exception, e:
+                transform_list.append((e, token))
+                break
 
             if get_transform_list:
                 transform_list.append(new_token)
@@ -105,8 +110,11 @@ class FieldSource(object):
 
 
 class Transformer(object):
-    def __init__(self, *args):
-        pass
+    def __init__(self, arguments):
+        self.args = args.parse_arguments(arguments)
+
+    def get_arg(self, name, position):
+        return self.args.get(name, self.args.get(position, None) if position is not None else None)
 
     def transform(self, value):
         raise NotImplementedError()

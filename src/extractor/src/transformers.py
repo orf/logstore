@@ -1,16 +1,16 @@
 from .register import registry
 from .base import Transformer
 from datetime import datetime
+import shlex
 
 
 @registry.add_transformer("remove")
 class RemoveTransformer(Transformer):
-    def __init__(self, characters):
-        self.characters = characters
-
     def transform(self, value):
-        for character in self.characters:
-            value = value.replace(character, "")
+        characters = self.get_arg("characters", 0)
+        limit = self.get_arg("limit", None)
+        for character in shlex.split(characters):
+            value = value.replace(character, "", limit or -1)
 
         return value, None
 
@@ -29,8 +29,6 @@ class UpperCase(Transformer):
 
 @registry.add_transformer("time format")
 class TimeFormat(Transformer):
-    def __init__(self, pattern):
-        self.pattern = pattern
-
     def transform(self, value):
-        return datetime.strptime(value, self.pattern)
+        pattern = self.get_arg("pattern", 0)
+        return datetime.strptime(value, pattern)
