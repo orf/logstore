@@ -14,12 +14,15 @@ class Format(object):
     def process(self, message, debug=False):
         tokens = self.splitter.split(message)
         results = {}
-        if debug:
-            for field in self.fields:  # Python 2.6 doesn't support dictionary comprehensions.
-                results[field.name] = field.process(tokens, debug)
-        else:
-            results = {}
-            map(results.update, (f.process(tokens) for f in self.fields))
+        for field in self.fields:
+            d, has_errored = field.process(tokens, debug)
+            if has_errored:
+                results = {}
+                break
+            if debug:
+                results[field.name] = d
+            else:
+                results.update(d)
         return results
 
 
@@ -46,9 +49,12 @@ class Field(object):
         self.type = type
 
     def process(self, tokens, get_transform_list=False):
+        # ToDo: Refactor this whole ugly method
         token = self.source.get_token(tokens)
         path = self.name
         returner = {self.name: token}
+
+        has_errored = False
 
         if get_transform_list:
             transform_list = []
@@ -59,6 +65,7 @@ class Field(object):
             except Exception, e:
                 if get_transform_list:
                     transform_list.append((e, token))
+                has_errored = True
                 break
 
             if get_transform_list:
@@ -80,16 +87,16 @@ class Field(object):
             except Exception, e:
                 if get_transform_list:
                     transform_list.append((e, self.type))
+                self.set_from_path(returner, path, None)  # Set it to null
             else:
                 self.set_from_path(returner, path, typed)
                 if get_transform_list:
                     transform_list.append(typed)
 
         if get_transform_list:
-            return transform_list
+            return transform_list, has_errored
 
-        return returner
-        #return {self.name: token.get_data(type=self.type)}  #self.type(token) if self.type else token}
+        return returner, has_errored
 
     def set_from_path(self, dictionary, path, new_value):
         split_path = path.split(".")
