@@ -1,5 +1,9 @@
 from string import Template
 from . import args
+from collections import namedtuple
+
+
+FieldResult = namedtuple("FieldResult", "result token new_path ")
 
 
 class Format(object):
@@ -7,10 +11,15 @@ class Format(object):
         self.splitter = splitter
         self.fields = fields
 
-    def process(self, message):
+    def process(self, message, debug=False):
         tokens = self.splitter.split(message)
         results = {}
-        map(results.update, (f.process(tokens) for f in self.fields))
+        if debug:
+            for field in self.fields:  # Python 2.6 doesn't support dictionary comprehensions.
+                results[field.name] = field.process(tokens, debug)
+        else:
+            results = {}
+            map(results.update, (f.process(tokens) for f in self.fields))
         return results
 
 
@@ -48,7 +57,8 @@ class Field(object):
             try:
                 new_token, new_path = transformer.transform(token)
             except Exception, e:
-                transform_list.append((e, token))
+                if get_transform_list:
+                    transform_list.append((e, token))
                 break
 
             if get_transform_list:
@@ -63,16 +73,20 @@ class Field(object):
             else:
                 token = new_token
 
-        if get_transform_list:
-            return transform_list
-
         # Update the type
         if self.type:
-            self.set_from_path(
-                returner,
-                path,
-                self.type(self.get_from_path(returner, path))
-            )
+            try:
+                typed = self.type(self.get_from_path(returner, path))
+            except Exception, e:
+                if get_transform_list:
+                    transform_list.append((e, self.type))
+            else:
+                self.set_from_path(returner, path, typed)
+                if get_transform_list:
+                    transform_list.append(typed)
+
+        if get_transform_list:
+            return transform_list
 
         return returner
         #return {self.name: token.get_data(type=self.type)}  #self.type(token) if self.type else token}
@@ -111,10 +125,7 @@ class FieldSource(object):
 
 class Transformer(object):
     def __init__(self, arguments):
-        self.args = args.parse_arguments(arguments)
-
-    def get_arg(self, name, position):
-        return self.args.get(name, self.args.get(position, None) if position is not None else None)
+        self.args = args.Arguments(arguments)
 
     def transform(self, value):
         raise NotImplementedError()

@@ -2,7 +2,7 @@ import unittest
 
 from ..base import Format, Field, FieldSource, Transformer
 from ..splitters import Character
-from ..transformers import RemoveTransformer
+from ..transformers import Remove
 
 
 class DataTransformer(Transformer):
@@ -14,7 +14,7 @@ class TransformerTests(unittest.TestCase):
     def TestProcessData(self):
         format = Format(splitter=Character(" "),
                         fields=[
-                            Field("IP", FieldSource("2"), [DataTransformer(), RemoveTransformer(":")])
+                            Field("IP", FieldSource("2"), [DataTransformer(), Remove(":")])
                         ])
         x = format.process("Reply from 83.100.221.240: bytes=32 time=289ms TTL=60")
         self.assertEqual(x["IP"], {"new_key": "83.100.221.240"})
@@ -22,7 +22,7 @@ class TransformerTests(unittest.TestCase):
     def TestProcessDataMultiple(self):
         format = Format(splitter=Character(" "),
                         fields=[
-                            Field("IP", FieldSource("2"), [DataTransformer(), DataTransformer(), RemoveTransformer(":")])
+                            Field("IP", FieldSource("2"), [DataTransformer(), DataTransformer(), Remove(":")])
                         ])
         x = format.process("Reply from 83.100.221.240: bytes=32 time=289ms TTL=60")
         self.assertEqual(x["IP"], {"new_key": {"new_key": "83.100.221.240"}})
