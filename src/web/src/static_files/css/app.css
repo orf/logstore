@@ -8911,3 +8911,15 @@ th.hide-for-touch {
 .buttonHolder > input {
   margin-right: 20px;
 }
+
+/* line 10, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/app.scss */
+pre {
+  white-space: pre-wrap;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* line 16, C:/Users/tom/PycharmProjects/logstore/src/web/src/static_files/scss/app.scss */
+.search-field > input {
+  box-sizing: content-box;
+}

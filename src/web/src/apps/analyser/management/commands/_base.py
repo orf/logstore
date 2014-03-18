@@ -90,6 +90,7 @@ class QueueProcessCommand(BaseCommand):
         self.es.indices.create("logs", body={
             "mappings": {
                 "line": {
+                    #"_all": {"enabled": False},
                     "properties": {
                         "message": {"type": "string"},
                         "events": {"type": "string"},

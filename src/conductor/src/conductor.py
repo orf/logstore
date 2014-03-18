@@ -6,7 +6,7 @@ from twisted.internet import reactor
 from .services.frontend.frontend import FrontendConnector
 from .services.daemon.factory import AuthenticatingThriftServerFactory
 from .services.internal.factory import InternalServiceFactory
-from .services.queue.factory import RabbitMQConnectionFactory
+from .services.queue.factory import RabbitMQConnectionFactory, rabbitmq_reconnector
 from .services.live_update.factory import LiveUpdateFactory
 from .services.syslog.factory import SysLogFactory
 from .services.stats.stats import Stats
@@ -37,7 +37,7 @@ def make_service(config):
 
     #internet.UDPClient("192.168.137.79", 8125, graphite).setServiceParent(conductor_service)
     #clientFromString(reactor, config["statsd_addr"]).connect(graphite)
-    clientFromString(reactor, config["queue_addr"]).connect(queue_factory)
+    rabbitmq_reconnector(clientFromString(reactor, config["queue_addr"]), queue_factory)
     #internet.TCPClient("localhost", 5672, queue_factory).setServiceParent(conductor_service)
     internet.TCPServer(6060, daemon_service_factory).setServiceParent(conductor_service)
     internet.TCPServer(6061, internal_service_factory, interface="127.0.0.1").setServiceParent(conductor_service)

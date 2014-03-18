@@ -71,7 +71,15 @@ class LiveUpdateFactory(WampServerFactory):
         yield readBody(resp)  # ToDo: Check if this this needed
 
     @defer.inlineCallbacks
-    def add_live_update_query(self, query):
+    def add_live_update_query(self, query_string, streams=None, servers=None):
+        query = "(%s)" % query_string
+        if servers or streams:
+            # Add servers and streams to the query string
+            if servers:
+                query += " AND (%s) " % " OR ".join(["server_id:%s" % server for server in servers])
+            if streams:
+                query += " AND (%s) " % " OR ".join(["stream_name:'%s'" % stream for stream in streams])
+
         query_hash = self.get_query_hash(query, namespace="lu")
         if query_hash not in self.percolators:
             yield self.create_percolator(query, query_hash)
@@ -99,6 +107,7 @@ class LiveUpdateFactory(WampServerFactory):
                 {
                     "query": {
                         "query_string": {
+                            "default_field": "message",
                             "query": query
                         }
                     }
@@ -120,7 +129,7 @@ class LiveUpdateFactory(WampServerFactory):
                                         "message": line,
                                         "data": {"time": time},
                                         "server_id": server_id,
-                                        "file_name": file_name,
+                                        "stream_name": file_name,
                                         "search_id": search_id
                                     }
                                 })

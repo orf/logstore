@@ -24,6 +24,9 @@ class Options(usage.Options):
 class StandardInputForwarder(basic.LineReceiver):
     implements(interfaces.IHalfCloseableProtocol)
 
+    #from os import linesep as delimiter
+    delimiter = "\n"
+
     def __init__(self, endpoint_deferred, file_name):
         self.endpoint_deferred = endpoint_deferred
         self.file_name = file_name

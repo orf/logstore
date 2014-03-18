@@ -5,6 +5,9 @@ from twisted.python import log
 import pika
 
 
+# ToDo: Fix all of this. It doesn't handle rabbitmq reconnection *at all* :(
+
+
 class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
     def __init__(self, parameters, input_queues):
         super(RabbitMQConnectionProtocol, self).__init__(parameters)
@@ -36,7 +39,8 @@ class RabbitMQConnectionProtocol(twisted_connection.TwistedProtocolConnection):
                 defer.returnValue(None)
 
     def connectionLost(self, reason):
-        self._set_connection_state(self.CONNECTION_CLOSED)  # Seems to be a bug or something, this isn't set.
+        #self._set_connection_state(self.CONNECTION_CLOSED)  # Seems to be a bug or something, this isn't set
+        print "Lost RabbitMQ connection"
         super(RabbitMQConnectionProtocol, self).connectionLost(reason)
 
     def connectionMade(self):

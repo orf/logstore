@@ -32,6 +32,7 @@ class Command(QueueProcessCommand):
                 pass
             else:
                 if "field_errors" in extracted_data:
+                    #print "Field errors: %s" % extracted_data["field_errors"]
                     data.setdefault("field_errors", []).append(extracted_data["field_errors"])
                 else:
                     data.update(extracted_data)
@@ -97,7 +98,7 @@ class Command(QueueProcessCommand):
     def get_formats(self, stream_name):
         if stream_name not in self.format_cache:
             self.format_cache[stream_name] = [f.create_format()
-                                            for f in Format.objects.filter(streams__name=stream_name).all()]
+                                              for f in Format.objects.filter(streams__name=stream_name).all()]
         return self.format_cache[stream_name]
 
     def get_events(self, ids):

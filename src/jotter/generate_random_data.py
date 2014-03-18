@@ -14,4 +14,4 @@ for i in xrange(int(sys.argv[1])):
         sys.stdout.write("Request timed out.\n")
     else:
         sys.stdout.write("Reply from %s: bytes=32 time=%sms TTL=60\n" % (random_ip(), random.randint(1, 100)))
-    time.sleep(0.1)
+    #time.sleep(0.1)

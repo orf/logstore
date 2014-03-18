@@ -37,6 +37,9 @@ class Format(models.Model):
             return ""
         return " OR ".join('(stream_name:"%s")' % name for name in names) + postfix
 
+    def get_stream_name_filter_query(self):
+        return {"terms": {"stream_name": list(self.streams.values_list("name", flat=True))}}
+
     def get_splitter(self):
         return registry.get_splitter_by_name(self.splitter_type)(self.splitter_args)
 

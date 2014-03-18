@@ -6,3 +6,13 @@
 .buttonHolder > input {
   margin-right: 20px;
 }
+
+pre {
+  white-space: pre-wrap;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.search-field > input {
+  box-sizing: content-box;
+}

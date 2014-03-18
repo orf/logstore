@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+
 {% block tail_includes %}
     <script src="{% static "js/autobahn/autobahn.min.js" %}"></script>
     <script src="{% static "apps/search/js/search.js" %}"></script>
     <script src="{% static "apps/search/js/doT.min.js" %}"></script>
     <script src="{% static "apps/search/js/moment.min.js" %}"></script>
+    <script src="{% static "chosen/chosen.jquery.js" %}"></script>
     <script>
         window.serverNames = {
         {% for server in servers %}
@@ -18,9 +20,9 @@
     <script type="text/template" id="log_template">
         <p class="log_entry">
             <!--<span class="time_info">
-                {{= moment(it.item._source.read_time).format("D/M/YY")}} {{= moment(it.item._source.read_time).format("HH:mm:ss")}}
+                {{= moment(it.item._source.time).format("D/M/YY")}} {{= moment(it.item._source.read_time).format("HH:mm:ss")}}
             </span>-->
-            <span class="file_info">{{= it.item._source.file_name }}</span>
+            <span class="file_info">{{= it.item._source.stream_name }}</span>
             <span class="server_info">{{= it.getServerName(it.item._source.server_id) }}</span>
             <span>{{= it.item._source.message}}</span>
         </p>
@@ -42,9 +44,25 @@
             <div class="medium-3 large-2 columns">
                 <div class="search_sidebar show-for-medium-up">
                     <div class="panel">
-                        <h5>This is a regular panel.</h5>
-                        <p>Total: <span id="hits">0</span> results</p>
-                        <p>Took: <span id="took"></span>ms</p>
+                        <p><strong><span id="hits">0</span></strong> hits <small>(<span id="took">...</span>ms)</small></p>
+                        <hr/>
+                        <p>
+                            <strong>Servers</strong>
+                            <select class="chosen" multiple id="server_filter" data-placeholder="Filter servers">
+                                {% for server in servers %}
+                                    <option value="{{ server.id }}">{{ server.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                        <p>
+                            <strong>Streams</strong>
+                            <select class="chosen" multiple id="stream_filter" data-placeholder="Filter streams">
+                                {% for stream in streams %}
+                                    <option value="{{ stream }}">{{ stream }}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+
                     </div>
                 </div>
             </div>

@@ -15,30 +15,52 @@ es = Elasticsearch(settings.ELASTICSEARCH_URL)
 
 class GetLogFileNamesView(View):
     def get(self, *args, **kwargs):
-        results = es.search("logs", "line", {"query": {"match_all": {}},
-                                             "facets": {"file_name": {"terms": {"field": "file_name"}}}}, size=0)
+        results = es.search("logs",
+                            "line",
+                            {
+                                "query": {
+                                    "match_all": {}
+                                },
+                                "facets": {
+                                    "stream_names": {
+                                        "terms": {
+                                            "field": "stream_name"
+                                        }
+                                    }
+                                }
+                            },
+                            size=0)
         return HttpResponse(json.dumps(
-            [x["term"] for x in results["facets"]["file_name"]["terms"]]
+            [x["term"] for x in results["facets"]["stream_names"]["terms"]]
         ), status=200, content_type="text/json")
 
 
 class SearchLogsView(View):
     def get(self, *args, **kwargs):
+        filter = {}
 
+        for key_name, filter_name, type_convert in (("stream[]", "stream_name", unicode),
+                                                    ("server[]", "server_id", int)):
+            if key_name in self.request.GET:
+                objs = [type_convert(n) for n in self.request.GET.getlist(key_name) if n]
+                if objs:
+                    filter.setdefault("and", []).append({"bool": {"must": {"terms": {filter_name: objs}}}})
         results = es.search(
             body={
                 "query": {
                     "query_string": {
-                        "query": self.request.GET["query"]
+                        "default_field": "message",
+                        "query": self.request.GET["query_string"]
                     }
                 },
+                "filter": filter,
                 "highlight": {
                     "fields": {
                         "message": {}
                     }
                 },
                 "sort": {
-                    "read_time": "desc"
+                    "data.time": "desc"
                 }
             },
             index="logs",
@@ -65,20 +87,13 @@ class GetRandomLogMessageView(View):
     def get(self, request, *args, **kwargs):
         if "format_id" in request.GET:
             format = get_object_or_404(Format, id=request.GET["format_id"])
-            query = {
-                "query_string": {
-                    "query": format.get_stream_name_query()
-                }
-            }
+            filter = format.get_stream_name_filter_query()
         else:
-            query = {
-                "match_all": {}
-            }
-
+            filter = {}
         results = es.search("logs",
                             "line",
                             {
-                                "query": query,
+                                "filter": filter,
                                 "sort": {
                                     "_script": {
                                         "script": "Math.random()",
@@ -89,7 +104,7 @@ class GetRandomLogMessageView(View):
                                 }
                             },
                             size=1)
-
+        print "Took %s" % results["took"]
         hits = results["hits"]["hits"]
         msg = hits[0]["_source"]["message"] if len(hits) else ""
         return HttpResponse(msg, status=200, content_type="text/plain")
