@@ -1,12 +1,11 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, Submit, ButtonHolder
+from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, Submit, ButtonHolder, Button
 
-from .models import Format, Splitter, Field, Transform
+from .models import Format, Field, Transform
 
 
 class AddFormatForm(forms.ModelForm):
-
     helper = FormHelper()
     helper.form_method = "POST"
     helper.layout = Layout(
@@ -24,25 +23,56 @@ class AddFormatForm(forms.ModelForm):
         fields = ("name",)
 
 
-class SplitterForm(forms.ModelForm):
+class ModifyFormatForm(forms.ModelForm):
+    streams = forms.CharField(max_length=255, required=False)
+
     helper = FormHelper()
     helper.form_method = "POST"
     helper.layout = Layout(
         Fieldset(
-            'Create Splitter',
-            "type", "args"
+            "Modify format",
+            "name", "streams", "splitter_type", "splitter_args"
         ),
-        ButtonHolder(Submit('submit', 'Submit', css_class="small"))
+        ButtonHolder(Submit('submit', 'Update', css_class="small"))
     )
 
-    def __init__(self, *args, **kwargs):
-        if "instance" in kwargs and kwargs["instance"]:
-            self.helper.layout.fields[0].legend = "Modify Splitter"
-        super(SplitterForm, self).__init__(*args, **kwargs)
-
     class Meta:
-        model = Splitter
-        fields = ("type", "args")
+        model = Format
+        fields = ("name", "splitter_type", "splitter_args")
+
+
+class TestFormatDataForm(forms.Form):
+    input = forms.CharField(max_length=2048)
+
+    def __init__(self, *args, **kwargs):
+        format_id = kwargs.pop("format_id")
+        self.helper = FormHelper()
+        self.helper.form_method = "POST"
+        self.helper.layout = Layout(
+            Fieldset(
+                "Enter test data",
+                Row(
+                    Column('input', css_class='small-7 medium-9'),
+                    Column(
+                        Row(
+                            Column(HTML("<label>&nbsp;</label>"),
+                                   HTML("""<a class='button tiny secondary' id='refresh_button' data-formatid=%s>
+                                            <i class='fi-refresh large'></i></a>""" % format_id),
+                                   css_class='small-3'),
+                            Column(HTML("<label>&nbsp;</label>"),
+                                   Submit('submit', 'Submit', css_class="tiny"),
+                                   css_class='small-9')
+                        ),
+                        css_class="small-5 medium-3"
+                    )
+                )
+            ),
+        )
+
+
+        super(TestFormatDataForm, self).__init__(*args, **kwargs)
+
+
 
 
 class FieldForm(forms.ModelForm):

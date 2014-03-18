@@ -118,7 +118,7 @@ class LiveUpdateFactory(WampServerFactory):
                                 {
                                     "_source": {
                                         "message": line,
-                                        "read_time": time,
+                                        "data": {"time": time},
                                         "server_id": server_id,
                                         "file_name": file_name,
                                         "search_id": search_id

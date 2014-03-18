@@ -21,26 +21,32 @@ class Command(QueueProcessCommand):
         read_time = parse(message["read_time"])
 
         data = message.get("data", {})
-        data.update({"read_time": read_time})
+        data.update({"time": read_time})
         formats = self.get_formats(message["file_name"])
 
         for format in formats:
             try:
-                data.update(format.process(message["log_message"]))
+                extracted_data = format.process(message["log_message"])
             except Exception, e:
                 print e
                 pass
+            else:
+                if "field_errors" in extracted_data:
+                    data.setdefault("field_errors", []).append(extracted_data["field_errors"])
+                else:
+                    data.update(extracted_data)
 
         doc = {
             "message": message["log_message"],
             "server_id": message["server_id"],
             "stream_name": message["file_name"],
             "events": [],
+            "failed_formats": [],
             "data": data
         }
 
         result = self.es.index(index="logs", doc_type="line", body=doc)
-        self.client.increment_stat("processed_message")
+        self.send_to_conductor("increment_stat", "processed_message")
         percolate_result = self.es.percolate(index="logs", doc_type="line", id=result["_id"])
 
         # ToDo: Refactor this to handle events first, then handle live updates.
@@ -64,7 +70,7 @@ class Command(QueueProcessCommand):
                 if new_names:
                     doc["events"].extend(new_names)
                     updated_result = self.es.index("logs", "line", doc, id=search_id)
-                    self.client.increment_stat("got_event_hit")
+                    self.send_to_conductor("increment_stat", "got_event_hit")
 
                     # Check to see if it matches any new percolators
                     new_percolate_result = self.es.percolate(index="logs", doc_type="line", id=search_id)
@@ -84,16 +90,15 @@ class Command(QueueProcessCommand):
                                doc["message"],
                                read_time.isoformat(),
                                doc["server_id"],
-                               doc["file_name"],
+                               doc["stream_name"],
                                matches,
                                result_id)
 
-    def get_formats(self, file_name):
-        if file_name not in self.format_cache:
-            self.format_cache[file_name] = [f.create_format()
-                                            for f in Format.objects.filter(files__name=file_name)
-                                                              .exclude(splitter=None).all()]
-        return self.format_cache[file_name]
+    def get_formats(self, stream_name):
+        if stream_name not in self.format_cache:
+            self.format_cache[stream_name] = [f.create_format()
+                                            for f in Format.objects.filter(streams__name=stream_name).all()]
+        return self.format_cache[stream_name]
 
     def get_events(self, ids):
         for id in ids:

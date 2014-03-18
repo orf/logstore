@@ -26,7 +26,7 @@ class SysLogProtocol(AuthenticatingMixin, LineReceiver):
     def lineReceived(self, line):
         line = line.strip()
         severity, facility = self._calc_lvl(line)
-
+        # ToDo: Handle timezones here
         self.factory.queue.queue_message(
             json.dumps({"data": {"severity": severity, "facility": facility},
                         "server_id": self.server_id,

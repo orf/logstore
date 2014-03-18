@@ -5,26 +5,40 @@ from django.core.exceptions import ValidationError
 import string
 
 
-def no_spaces(value):
+def no_spaces_validator(value):
     for char in string.whitespace:
         if char in value:
             raise ValidationError("Must not contain whitespace")
 
 
+def no_reserved_names_validator(value):
+    if value in ("field_errors",):
+        raise ValidationError("%s is a reserved name, please choose another" % value)
+
+
+splitter_choices = registry.get_splitter_choices()
+
+
 class Format(models.Model):
     name = models.CharField(max_length=250)
 
+    splitter_type = models.CharField(choices=splitter_choices, default=splitter_choices[0][0], max_length=255)
+    splitter_args = models.CharField(max_length=250, null=True, blank=True)
+
     def create_format(self):
         return ExtractorFormat(
-            splitter=self.splitter.get_splitter(),
+            splitter=self.get_splitter(),
             fields=[field.get_field() for field in self.fields.all()]
         )
 
-    def get_file_name_query(self, postfix=""):
+    def get_stream_name_query(self, postfix=""):
         names = self.streams.values_list("name")
         if not names:
             return ""
         return " OR ".join('(stream_name:"%s")' % name for name in names) + postfix
+
+    def get_splitter(self):
+        return registry.get_splitter_by_name(self.splitter_type)(self.splitter_args)
 
 
 class FormatStream(models.Model):
@@ -32,17 +46,8 @@ class FormatStream(models.Model):
     format = models.ForeignKey("formats.Format", related_name="streams")
 
 
-class Splitter(models.Model):
-    type = models.CharField(choices=registry.get_splitter_choices(), max_length=255)
-    args = models.CharField(max_length=250, null=True, blank=True)
-    format = models.OneToOneField("formats.Format")
-
-    def get_splitter(self):
-        return registry.get_splitter_by_name(self.type)(self.args)
-
-
 class Field(models.Model):
-    name = models.CharField(max_length=100, validators=[no_spaces])
+    name = models.CharField(max_length=100, validators=[no_spaces_validator, no_reserved_names_validator])
     type = models.CharField(choices=registry.get_type_choices(), max_length=255)
     source_template = models.CharField(max_length=255)
     format = models.ForeignKey("formats.Format", related_name="fields")

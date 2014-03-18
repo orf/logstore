@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
-from .views import FormatsListView, FormatDeleteView, FormatDetailView, SplitterView,\
-    AddFieldView, AddTransformationView, EditFormatStreamsView, DeleteTransformView
+from .views import FormatsListView, FormatDeleteView, FormatDetailView,\
+    AddFieldView, AddTransformationView, FormatTestDataView, DeleteTransformView
 
 
 urlpatterns = patterns('',
@@ -9,8 +9,7 @@ urlpatterns = patterns('',
     url(r'^delete/(?P<format_id>\d+)$', FormatDeleteView.as_view(pk_url_kwarg="format_id"), name="delete"),
 
     url(r'^(?P<format_id>\d+)$', FormatDetailView.as_view(pk_url_kwarg="format_id"), name="edit"),
-    url(r'^(?P<format_id>\d+)/edit_streams$', EditFormatStreamsView.as_view(), name="edit_streams"),
-    url(r'^(?P<format_id>\d+)/splitter$', SplitterView.as_view(), name="edit_splitter"),
+    url(r'^(?P<format_id>\d+)/test$', FormatTestDataView.as_view(pk_url_kwarg="format_id"), name="test"),
     url(r'^(?P<format_id>\d+)/field$', AddFieldView.as_view(), name="add_field"),
     url(r'^(?P<format_id>\d+)/field/(?P<field_id>\d+)$', AddFieldView.as_view(), name="modify_field"),
     url(r'^(?P<format_id>\d+)/field/(?P<field_id>\d+)/transform$',

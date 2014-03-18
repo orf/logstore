@@ -4,7 +4,9 @@ from django.views.generic import View
 from django.http.response import HttpResponse
 from elasticsearch import Elasticsearch
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
+from ..formats.models import Format
 from ..servers.models import Server
 
 
@@ -57,3 +59,37 @@ class ServerAuthView(View):
             return HttpResponse("", status=401)
         else:
             return HttpResponse(str(server.id), status=200)
+
+
+class GetRandomLogMessageView(View):
+    def get(self, request, *args, **kwargs):
+        if "format_id" in request.GET:
+            format = get_object_or_404(Format, id=request.GET["format_id"])
+            query = {
+                "query_string": {
+                    "query": format.get_stream_name_query()
+                }
+            }
+        else:
+            query = {
+                "match_all": {}
+            }
+
+        results = es.search("logs",
+                            "line",
+                            {
+                                "query": query,
+                                "sort": {
+                                    "_script": {
+                                        "script": "Math.random()",
+                                        "type": "number",
+                                        "params":{},
+                                        "order": "asc"
+                                    }
+                                }
+                            },
+                            size=1)
+
+        hits = results["hits"]["hits"]
+        msg = hits[0]["_source"]["message"] if len(hits) else ""
+        return HttpResponse(msg, status=200, content_type="text/plain")

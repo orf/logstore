@@ -3,113 +3,45 @@
 
 {% block format_content %}
     <div class="row">
-        <div class="small-12 columns">
-            <div class="panel">
-                <strong>Splitter:</strong>
-                {% if format.splitter %}
-                    <a href="{% url "formats:edit_splitter" format.id %}">
-                        {{ format.splitter.get_type_display }}
-                        {% if format.splitter.args %}({{ format.splitter.args }}){% endif %}
-                    </a>
-                {% else %}
-                    <a href="{% url "formats:edit_splitter" format.id %}">Define a splitter</a>
-                {% endif %}
-                <br/><br/>
-                <strong>Streams:</strong>
-                {% if format.streams.count %}
-                    <a href="{% url "formats:edit_streams" format.id %}">
-                        {% for stream in format.streams.all %}
-                            {{ stream.name }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    </a>
-                {% else %}
-                    <a href="{% url "formats:edit_streams" format.id %}">Specify streams</a>
-                {% endif %}
+        <div class="medium-5 columns">
+            {% crispy form %}
+        </div>
+
+        <div class="medium-7 columns">
+            <div class="row">
+                <div class="small-12 columns">
+                    <h5>Fields</h5>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="200">Name</th>
+                                <th width="150">Type</th>
+                                <th width="100">Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for field in format.fields.all %}
+                                <tr>
+                                    <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
+                                    <td>{{ field.get_type_display }}</td>
+                                    <td>{{ field.source_template }}</td>
+                                </tr>
+                            {% endfor %}
+
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="small-12 columns">
+                    <a class="button" href="{% url "formats:test" format.id %}">Test</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="small-6 columns">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="200">Name</th>
-                        <th width="150">Type</th>
-                        <th width="100">Source</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for field in format.fields.all %}
-                        <tr>
-                            <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
-                            <td>{{ field.get_type_display }}</td>
-                            <td>{{ field.source_template }}</td>
-                        </tr>
-                    {% endfor %}
 
-                    <tr>
-                        <td colspan="3" class="text-center">
-                            <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="small-5 columns end">
-            <form method="GET" action="">
-                <div class="row">
-                    <div class="row collapse">
-                        <div class="small-11 columns">
-                            <input type="text" name="test" placeholder="Enter Test Data" value="{{ test_message }}">
-                        </div>
-                        <div class="small-1 columns">
-                            <button class="button postfix">Go</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-        {% if test_message %}
-            <div class="row">
-                <div class="small-12 columns">
-                    <table>
-                        <thead>
-                            {% for index in test_split_data %}
-                                <th>{{ forloop.counter0 }}</th>
-                            {% endfor %}
-                        </thead>
-                        <tbody>
-                                <tr>
-                                    {% for item in test_split_data %}
-                                    <td>{{ item }}</td>
-                                    {% endfor %}
-                                </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="small-12 columns">
-                    <table>
-                        <thead>
-                            <th width="200">Name</th>
-                            <th width="200">Value</th>
-                        </thead>
-                        <tbody>
-                            {% for key, value in test_data.items %}
-                                <tr>
-                                    <td>{{ key }}</td>
-                                    <td>{{ value }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        {% endif %}
-        </div>
-    </div>
 {% endblock %}

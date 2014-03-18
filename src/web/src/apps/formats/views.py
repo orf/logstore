@@ -1,10 +1,12 @@
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView, FormView
+from django.views.generic import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
 
-from .models import Format, Splitter, Field, Transform, FormatStream
-from .forms import AddFormatForm, SplitterForm, FieldForm, TransformForm, FormatStreamsForm
+from .models import Format, Field, Transform, FormatStream
+from .forms import AddFormatForm, FieldForm, TransformForm, FormatStreamsForm, ModifyFormatForm, TestFormatDataForm
+
+import time
 
 
 class FormatMixin(ContextMixin):
@@ -39,38 +41,59 @@ class FormatDeleteView(DeleteView):
     http_method_names = ["post"]
 
 
-class FormatDetailView(DetailView):
+class FormatDetailView(UpdateView):
+    form_class = ModifyFormatForm
     model = Format
     template_name = "edit_format.html"
 
-    def get_context_data(self, **kwargs):
-        ctx = super(FormatDetailView, self).get_context_data(**kwargs)
-        if self.request.GET.get("test", None):
-            msg = self.request.GET["test"]
-            extractor = self.get_object().create_format()
-            ctx["test_data"] = extractor.process(msg)
-            ctx["test_message"] = msg
-            ctx["test_split_data"] = extractor.splitter.split(msg)
-
-        return ctx
-
-
-class SplitterView(FormatMixin, UpdateView):
-    form_class = SplitterForm
-    template_name = "edit_splitter.html"
-
-    def get_object(self, queryset=None):
-        try:
-            return Splitter.objects.get(format_id=self.kwargs["format_id"])
-        except Splitter.DoesNotExist:
-            return None
+    def get_initial(self):
+        return {
+            "streams": ", ".join((s.name for s in self.object.streams.all()))
+        }
 
     def form_valid(self, form):
-        form.instance.format_id = self.kwargs["format_id"]
-        return super(SplitterView, self).form_valid(form)
+        if "streams" in form.changed_data:
+            streams = set(x.strip() for x in form.cleaned_data["streams"].split(","))
+
+            self.object.streams.all().delete()
+
+            FormatStream.objects.bulk_create(
+                [FormatStream(name=n, format=self.object) for n in streams]
+            )
+
+        return super(FormatDetailView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("formats:edit", args=[self.object.format_id])
+        return reverse_lazy("formats:edit", args=[self.object.id])
+
+
+class FormatTestDataView(SingleObjectMixin, FormView):
+    form_class = TestFormatDataForm
+    model = Format
+    template_name = "test_format.html"
+
+    def get_form_kwargs(self):
+        kwargs = super(FormatTestDataView, self).get_form_kwargs()
+        kwargs["format_id"] = self.kwargs["format_id"]
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(FormatTestDataView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(FormatTestDataView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        context = self.get_context_data(form=form)
+        extractor = self.get_object().create_format()
+        msg = form.cleaned_data["input"]
+        t1 = time.time()
+        context["extracted_data"] = extractor.process(msg, debug=True)
+        context["extraction_speed"] = (time.time() - t1) * 1000 # Get the ms total
+        context["split_data"] = extractor.splitter.split(msg)
+        return self.render_to_response(context)
 
 
 class AddFieldView(FormatMixin, UpdateView):
@@ -124,21 +147,7 @@ class EditFormatStreamsView(FormatMixin, SingleObjectMixin, FormView):
         self.object = self.get_object()
         return super(EditFormatStreamsView, self).dispatch(request, *args, **kwargs)
 
-    def get_initial(self):
-        return {
-            "streams": ", ".join((s.name for s in self.object.streams.all()))
-        }
 
-    def form_valid(self, form):
-        streams = set(x.strip() for x in form.cleaned_data["streams"].split(","))
-
-        self.object.streams.all().delete()
-
-        FormatStream.objects.bulk_create(
-            [FormatStream(name=n, format=self.object) for n in streams]
-        )
-
-        return super(EditFormatStreamsView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy("formats:edit", args=[self.get_object().id])

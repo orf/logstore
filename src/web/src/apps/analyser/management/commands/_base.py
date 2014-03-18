@@ -44,12 +44,12 @@ class QueueProcessCommand(BaseCommand):
         self.es = Elasticsearch('http://localhost:9200/')
         try:
             self.create_mappings()
-        except Exception:
+        except Exception, e:
             pass
 
         connection = pika.BlockingConnection()
         channel = connection.channel()
-        channel.basic_qos(prefetch_count=20)
+        channel.basic_qos(prefetch_count=1)
 
         self.client = self.get_thrift_client()
 
@@ -92,18 +92,18 @@ class QueueProcessCommand(BaseCommand):
                 "line": {
                     "properties": {
                         "message": {"type": "string"},
-                        "read_time": {"type": "date"},
                         "events": {"type": "string"},
 
                         "data": {
-                            "type": "object"
+                            "type": "object",
+                            "read_time": {"type": "date"},
                         },
 
                         "server_id": {
                             "type": "integer",
                         },
 
-                        "file_name": {
+                        "stream_name": {
                             "type": "string",
                         }
                     }

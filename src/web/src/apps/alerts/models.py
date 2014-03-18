@@ -106,7 +106,7 @@ class AlertCondition(models.Model):
         if self.event_query_id:
             return self.event_query.get_file_name_query(postfix)
         else:
-            return self.format_field.format.get_file_name_query(postfix)
+            return self.format_field.format.get_stream_name_query(postfix)
 
     def get_query(self, started, filter_by_event=True):
         qs = self.get_file_filter(postfix=" AND " if filter_by_event else "")
