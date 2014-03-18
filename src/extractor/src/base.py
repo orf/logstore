@@ -17,7 +17,7 @@ class Format(object):
         for field in self.fields:
             d, has_errored = field.process(tokens, debug)
             if has_errored:
-                results = {}
+                results = {"field_errors": field.name}
                 break
             if debug:
                 results[field.name] = d
