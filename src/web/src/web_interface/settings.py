@@ -69,8 +69,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'template_timings_panel',
     'crispy_forms',
-    'crispy_forms_foundation',
-    'django_activeurl',
+    'crispy_forms_foundation'
 )
 
 MIDDLEWARE_CLASSES = (

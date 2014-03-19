@@ -21,4 +21,4 @@ pushd %DIST_DIR%
 for %%f in (*.tar.gz) DO pip install %%f --download-cache="C:\Users\tom\.pypi_cache" --find-links=%DIST_DIR% --upgrade
 popd
 
-rm -r -f %DIST_DIR%
+:rm -r -f %DIST_DIR%
