@@ -10,4 +10,4 @@ setup(name="logstore.ext.transformers.user_agent",
       namespace_packages =["logstore", "logstore.ext", "logstore.ext.transformers"],
       packages=["logstore.ext.transformers.user_agent"] + ["logstore.ext.transformers.user_agent." + p
                                                            for p in find_packages("src")],
-      install_requires=["httpagentparser"])
+      install_requires=["httpagentparser", "logstore.extractor"])

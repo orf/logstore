@@ -10,4 +10,4 @@ setup(name="logstore.ext.transformers.http_request",
       namespace_packages =["logstore", "logstore.ext", "logstore.ext.transformers"],
       packages=["logstore.ext.transformers.http_request"] + ["logstore.ext.transformers.http_request." + p
                                                              for p in find_packages("src")],
-      install_requires=[])
+      install_requires=["logstore.extractor"])
