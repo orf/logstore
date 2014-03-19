@@ -31,6 +31,7 @@
     }
     for (_i = 0, _len = results.length; _i < _len; _i++) {
       result = results[_i];
+      console.log(result);
       $("#search_results").append(template_func({
         item: result,
         getServerName: getServerNameFromID,

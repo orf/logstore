@@ -25,6 +25,7 @@ displaySearchResults = (results, inc_counter=false) ->
     $("#hits").text +$("#hits").text() + 1
 
   for result in results
+    console.log result
     $("#search_results").append(
           template_func(
             item: result
@@ -86,7 +87,6 @@ gotWebSocketConnection = (session) ->
 
 getServerNameFromID = (id) ->
   window.serverNames[id]
-
 
 getSearchResults = (query, size=100) ->
   $.get(Django.url("api:search"), $.extend({size: size}, query))
