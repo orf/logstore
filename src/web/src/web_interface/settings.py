@@ -59,9 +59,9 @@ INSTALLED_APPS = (
     'apps.statistics',
     'apps.alerts',
 
-    'logstore.ext.geoip_transformer',
-    'logstore.ext.user_agent_transformer',
-    'logstore.ext.http_request_transformer',
+    'logstore.ext.transformer.geoip',
+    'logstore.ext.transformer.user_agent',
+    'logstore.ext.transformer.http_request',
 
     'kronos',
     'djangojs',
