@@ -12,7 +12,7 @@ geoip_file = os.path.join(geoip_base_location, "GeoIP.dat")
 try:
     lookup = GeoIP(geoip_file, MEMORY_CACHE)
 except IOError:
-    warnings.warn("File %s does not exist, GeoIP lookups will fail" % geoip_file)
+    warnings.warn("File %s does not exist, GeoIP lookups will fail. Run the download_geoip task to fix this" % geoip_file)
     lookup = None
 
 
