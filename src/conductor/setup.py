@@ -12,7 +12,7 @@ setup(name="logstore.conductor",
       package_data={
           'twisted.plugins': ['conductor_plugin.py']
       },
-      install_requires=["logstore.thrift_protocol",
+      install_requires=["logstore.thrift-protocol",
                         "logstore.web",
                         "twisted==13.2.0",
                         "autobahn",

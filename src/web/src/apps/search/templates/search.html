@@ -3,21 +3,22 @@
 
 
 {% block tail_includes %}
-    <script src="{% static "js/autobahn/autobahn.min.js" %}"></script>
-    <script src="{% static "apps/search/js/search.js" %}"></script>
-    <script src="{% static "apps/search/js/doT.min.js" %}"></script>
-    <script src="{% static "apps/search/js/moment.min.js" %}"></script>
-    <script src="{% static "chosen/chosen.jquery.js" %}"></script>
     <script>
         window.serverNames = {
         {% for server in servers %}
-            {{ server.id }}:"{{ server.name }}",
+            {{ server.id }}: "{{ server.name }}",
         {% endfor %}
-        }
+        };
     </script>
 
-    {% verbatim %}
-    <script type="text/template" id="log_template">
+<script src="{% static "js/autobahn/autobahn.js" %}"></script>
+<script src="{% static "apps/search/js/search.js" %}"></script>
+<script src="{% static "apps/search/js/doT.min.js" %}"></script>
+<script src="{% static "apps/search/js/moment.min.js" %}"></script>
+<script src="{% static "chosen/chosen.jquery.js" %}"></script>
+
+{% verbatim %}
+<script type="text/template" id="log_template">
         <p class="log_entry">
             <!--<span class="time_info">
                 {{= moment(it.item._source.time).format("D/M/YY")}} {{= moment(it.item._source.read_time).format("HH:mm:ss")}}
@@ -27,55 +28,55 @@
             <span>{{= it.item._source.message}}</span>
         </p>
     </script>
-    {% endverbatim %}
+{% endverbatim %}
 {% endblock %}
 
 {% block content_override %}
-    <div class="search_header_container">
-        <div class="row" id="header_row">
-            <div class="large-12 columns search_header_row">
-                {% include "includes/search_bar.html" %}
-            </div>
+<div class="search_header_container">
+    <div class="row" id="header_row">
+        <div class="large-12 columns search_header_row">
+            {% include "includes/search_bar.html" %}
         </div>
     </div>
+</div>
 
-    <div class="search_content_container">
-        <div class="row">
-            <div class="medium-3 large-2 columns">
-                <div class="search_sidebar show-for-medium-up">
-                    <div class="panel">
-                        <p><strong><span id="hits">0</span></strong> hits <small>(<span id="took">...</span>ms)</small></p>
-                        <hr/>
-                        <p>
-                            <strong>Servers</strong>
-                            <select class="chosen" multiple id="server_filter" data-placeholder="Filter servers">
-                                {% for server in servers %}
-                                    <option value="{{ server.id }}">{{ server.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </p>
-                        <p>
-                            <strong>Streams</strong>
-                            <select class="chosen" multiple id="stream_filter" data-placeholder="Filter streams">
-                                {% for stream in streams %}
-                                    <option value="{{ stream }}">{{ stream }}</option>
-                                {% endfor %}
-                            </select>
-                        </p>
+<div class="search_content_container">
+    <div class="row">
+        <div class="medium-3 large-2 columns">
+            <div class="search_sidebar show-for-medium-up">
+                <div class="panel">
+                    <p><strong><span id="hits">0</span></strong> hits <small>(<span id="took">...</span>ms)</small></p>
+                    <hr/>
+                    <p>
+                        <strong>Servers</strong>
+                        <select class="chosen" multiple id="server_filter" data-placeholder="Filter servers">
+                            {% for server in servers %}
+                            <option value="{{ server.id }}">{{ server.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <strong>Streams</strong>
+                        <select class="chosen" multiple id="stream_filter" data-placeholder="Filter streams">
+                            {% for stream in streams %}
+                            <option value="{{ stream }}">{{ stream }}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
 
-                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="medium-9 large-10 columns" id="search_results">
+        <div class="medium-9 large-10 columns" id="search_results">
 
-            </div>
         </div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="small-12 columns" style="height: 30px">
-            &nbsp;
-        </div>
+<div class="row">
+    <div class="small-12 columns" style="height: 30px">
+        &nbsp;
     </div>
+</div>
 {% endblock %}

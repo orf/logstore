@@ -7,7 +7,7 @@ class InternalServiceFactory(TTwisted.ThriftServerFactory):
     protocol = InternalServiceProtocol
 
     def __init__(self, *args, **kwargs):
-        self.websocket_factory = kwargs.pop("websocket_factory")
+        self.websocket_component = kwargs.pop("websocket_component")
         self.daemon_service_factory = kwargs.pop("daemon_service_factory")
         self.queue_factory = kwargs.pop("queue_factory")
         self.stats = kwargs.pop("stats")

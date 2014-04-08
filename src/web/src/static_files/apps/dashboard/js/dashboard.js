@@ -30,27 +30,25 @@
   };
 
   $(document).ready(function() {
-    return ab.connect("ws://localhost:6062", gotWebSocketConnection, function(code, reason) {
-      return console.log("Error connecting to WebSockets: " + reason);
+    var connection;
+    connection = new autobahn.Connection({
+      url: "ws://localhost:6062/",
+      realm: 'realm1'
     });
+    connection.onopen = gotWebSocketConnection;
+    return connection.open();
   });
 
   gotWebSocketConnection = function(session) {
     console.log("Subscribed");
-    session.subscribe("logbook/stat/got_log_line", function(uri, event) {
-      return updateSpeedGraph("global_message_rates", event);
-    }, function(error, desc) {
-      return console.log("Error: " + error + " Desc: " + desc);
+    session.subscribe("logbook.stat.got_log_line", function(args) {
+      return updateSpeedGraph("global_message_rates", args[0]);
     });
-    session.subscribe("logbook/stat/got_event_hit", function(uri, event) {
-      return updateSpeedGraph("event_rates", event);
-    }, function(error, desc) {
-      return console.log("Error: " + error + " Desc: " + desc);
+    session.subscribe("logbook.stat.got_event_hit", function(args) {
+      return updateSpeedGraph("event_rates", args[0]);
     });
-    return session.subscribe("logbook/stat/processed_message", function(uri, event) {
-      return updateSpeedGraph("processed_message", event);
-    }, function(error, desc) {
-      return console.log("Error: " + error + " Desc: " + desc);
+    return session.subscribe("logbook.stat.processed_message", function(args) {
+      return updateSpeedGraph("processed_message", args[0]);
     });
   };
 

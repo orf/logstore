@@ -8,11 +8,13 @@ $(document).ready ->
 
       #$("html, body").animate({scrollTop: $(document).height()}, 0)
 
-  ab.connect("ws://localhost:6062",
-    gotWebSocketConnection,
-    (code, reason) -> console.log "Error connecting to WebSockets: " + reason
-  )
+  connection = new autobahn.Connection({
+    url:"ws://localhost:6062/",
+    realm: 'realm1'
+  })
 
+  connection.onopen = gotWebSocketConnection
+  connection.open()
   null
 
 node = document.getElementById("search_results")
@@ -25,7 +27,6 @@ displaySearchResults = (results, inc_counter=false) ->
     $("#hits").text +$("#hits").text() + 1
 
   for result in results
-    console.log result
     $("#search_results").append(
           template_func(
             item: result
@@ -44,14 +45,14 @@ displaySearchResults = (results, inc_counter=false) ->
 
 
 current_search_request = null;
-current_search_subscription = null;
 
 gotWebSocketConnection = (session) ->
-
   refresh_search_results = () ->
     query_string = $("#search_query").val()
     server_filter = $("#server_filter").val()
     stream_filter = $("#stream_filter").val()
+
+    console.log query_string
 
     query = {query_string: query_string, server: server_filter, stream: stream_filter}
 
@@ -70,19 +71,18 @@ gotWebSocketConnection = (session) ->
 
         displaySearchResults(data.hits.hits.reverse())
 
-    session.call "logbook/update#subscribe", query
+    session.call "logbook.update.subscribe", [query]
         .then (result) ->
-            if current_search_request != null
-              session.unsubscribe("logbook/live/" + current_search_request)
-            current_search_request = result
+            console.log result
+            #if current_search_subscription != null
+            #    current_search_subscription.unsubscribe()
+            #current_search_subscription = result
 
             # We have a successful RPC result, we should now subscribe to the returned channel ID
-            session.subscribe("logbook/live/" + result
-                              (uri, event) -> displaySearchResults([event], true)
-                              (error, desc) -> console.log "Error: " + error + " Desc: " + desc)
+            session.subscribe("logbook.live." + result, (args) -> displaySearchResults([args], true))
 
   refresh_search_results()
-  $(".chosen").on('change', (evt, params) -> refresh_search_results());
+  $(".chosen").on('change', (evt, params) -> refresh_search_results())
 
 
 getServerNameFromID = (id) ->

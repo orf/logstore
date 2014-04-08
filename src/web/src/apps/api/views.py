@@ -45,6 +45,7 @@ class SearchLogsView(View):
                 objs = [type_convert(n) for n in self.request.GET.getlist(key_name) if n]
                 if objs:
                     filter.setdefault("and", []).append({"bool": {"must": {"terms": {filter_name: objs}}}})
+
         results = es.search(
             body={
                 "query": {

@@ -53,12 +53,12 @@ class Command(QueueProcessCommand):
         # ToDo: Refactor this to handle events first, then handle live updates.
 
         if percolate_result["matches"]:
-            live_update_matches = [m["_id"] for m in percolate_result["matches"] if m["_id"].startswith("lu:")]
+            live_update_matches = [m["_id"] for m in percolate_result["matches"] if m["_id"].startswith("lu.")]
 
             if live_update_matches:
                 self.notify_live_update(doc, live_update_matches, result["_id"], read_time)
 
-            event_ids = [m["_id"] for m in percolate_result["matches"] if m["_id"].startswith("ev:")]
+            event_ids = [m["_id"] for m in percolate_result["matches"] if m["_id"].startswith("ev.")]
             if event_ids:
                 search_id = result["_id"]
 
@@ -77,7 +77,7 @@ class Command(QueueProcessCommand):
                     new_percolate_result = self.es.percolate(index="logs", doc_type="line", id=search_id)
                     if new_percolate_result["matches"]:
                         new_live_update_matches = [m["_id"] for m in new_percolate_result["matches"]
-                                                   if m["_id"].startswith("lu:")]
+                                                   if m["_id"].startswith("lu.")]
                         to_notify = set(new_live_update_matches) - set(live_update_matches)
                         if to_notify:
                             self.notify_live_update(doc, to_notify, updated_result["_id"], read_time)

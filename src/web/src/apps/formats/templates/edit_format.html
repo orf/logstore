@@ -2,46 +2,46 @@
 {% load crispy_forms_tags %}
 
 {% block format_content %}
-    <div class="row">
-        <div class="medium-5 columns">
-            {% crispy form %}
-        </div>
+<div class="row">
+    <div class="medium-5 columns">
+        {% crispy form %}
+    </div>
 
-        <div class="medium-7 columns">
-            <div class="row">
-                <div class="small-12 columns">
-                    <h5>Fields</h5>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="200">Name</th>
-                                <th width="150">Type</th>
-                                <th width="100">Source</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for field in format.fields.all %}
-                                <tr>
-                                    <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
-                                    <td>{{ field.get_type_display }}</td>
-                                    <td>{{ field.source_template }}</td>
-                                </tr>
-                            {% endfor %}
+    <div class="medium-7 columns">
+        <div class="row">
+            <div class="small-12 columns">
+                <h5>Fields</h5>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="200">Name</th>
+                            <th width="150">Type</th>
+                            <th width="100">Source</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in format.fields.all %}
+                        <tr>
+                            <td><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a></td>
+                            <td>{{ field.get_type_display }}</td>
+                            <td>{{ field.source_template }}</td>
+                        </tr>
+                        {% endfor %}
 
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="small-12 columns">
-                    <a class="button" href="{% url "formats:test" format.id %}">Test</a>
-                </div>
+                        <tr>
+                            <td colspan="3" class="text-center">
+                                <a href="{% url "formats:add_field" format.id %}"><i class="fi-plus"></i> Add Field</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="small-12 columns">
+                <a class="button" href="{% url "formats:test" format.id %}">Test</a>
             </div>
         </div>
     </div>
+</div>
 
 
 {% endblock %}

@@ -2,65 +2,65 @@
 {% load crispy_forms_tags %}
 
 {% block tail_includes %}
-    <script>
-        $(document).ready(function(){
-            $(".delete_link").click(function(){
-                $(this).parent("form").submit();
-            })
+<script>
+    $(document).ready(function() {
+        $(".delete_link").click(function() {
+            $(this).parent("form").submit();
         });
-    </script>
+    });
+</script>
 {% endblock %}
 
 {% block format_content %}
-    <div class="row">
-        <div class="small-12 columns">
-            <ul class="breadcrumbs">
-              <li><a href="{% url "formats:edit" format.id %}">{{ format.name }}</a></li>
-              {% if field %}
-                <li><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a> </li>
-              {% else %}
-                <li class="current">Add Field</li>
-              {% endif %}
-            </ul>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="breadcrumbs">
+            <li><a href="{% url "formats:edit" format.id %}">{{ format.name }}</a></li>
+            {% if field %}
+            <li><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a> </li>
+            {% else %}
+            <li class="current">Add Field</li>
+            {% endif %}
+        </ul>
     </div>
+</div>
 
-    <div class="row">
-        <div class="small-{{ field|yesno:"4,12" }} columns">
-            {% crispy form %}
-        </div>
-        {% if field %}
-        <div class="small-8 columns">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="200">Name</th>
-                        <th width="200">Arguments</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transform in field.transformations.all %}
-                        <tr>
-                            <td><a href="{% url "formats:modify_transformation" format.id field.id transform.id %}">{{ transform.get_type_display }}</a></td>
-                            <td>{{ transform.args }}</td>
-                            <td>
-                                <form method="POST" action="{% url "formats:delete_transformation" format.id field.id transform.id %}">
-                                        {% csrf_token %}
-                                        <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
-                                    </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-
-                    <tr>
-                        <td colspan="3" class="text-center">
-                            <a href="{% url "formats:add_transformation" format.id field.id %}"><i class="fi-plus"></i> Add Transformation</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
+<div class="row">
+    <div class="small-{{ field|yesno:"4,12" }} columns">
+        {% crispy form %}
     </div>
+    {% if field %}
+    <div class="small-8 columns">
+        <table>
+            <thead>
+                <tr>
+                    <th width="200">Name</th>
+                    <th width="200">Arguments</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transform in field.transformations.all %}
+                <tr>
+                    <td><a href="{% url "formats:modify_transformation" format.id field.id transform.id %}">{{ transform.get_type_display }}</a></td>
+                    <td>{{ transform.args }}</td>
+                    <td>
+                        <form method="POST" action="{% url "formats:delete_transformation" format.id field.id transform.id %}">
+                            {% csrf_token %}
+                            <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <a href="{% url "formats:add_transformation" format.id field.id %}"><i class="fi-plus"></i> Add Transformation</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

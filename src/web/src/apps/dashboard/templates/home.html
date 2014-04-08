@@ -6,60 +6,60 @@
 
 
 {% block tail_includes %}
-    <script src="{% static "js/d3.v3.min.js" %}"></script>
-    <script src="{% static "js/cubism.v1.js" %}"></script>
-    <script src="{% static "js/autobahn/autobahn.min.js" %}"></script>
-    <script src="{% static "apps/dashboard/js/jquery.sparkline.js" %}"></script>
-    <script src="{% static "apps/dashboard/js/dashboard.js" %}"></script>
+<script src="{% static "js/d3.v3.min.js" %}"></script>
+<script src="{% static "js/cubism.v1.js" %}"></script>
+<script src="{% static "js/autobahn/autobahn.js" %}"></script>
+<script src="{% static "apps/dashboard/js/jquery.sparkline.js" %}"></script>
+<script src="{% static "apps/dashboard/js/dashboard.js" %}"></script>
 
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="large-12 columns">
-            {% include "includes/search_bar.html" %}
+<div class="row">
+    <div class="large-12 columns">
+        {% include "includes/search_bar.html" %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="large-3 medium-6 columns">
+        <div class="panel">
+            <h5>Live Stats</h5>
+            <p>
+                Messages <span id="global_message_rates_graph"></span> <span id="global_message_rates_text">0</span> p/s
+            </p>
+            <p>
+                Event Hits <span id="event_rates_graph"></span> <span id="event_rates_text">0</span> p/s
+            </p>
+            <p>
+                Process Speed <span id="processed_message_graph"></span> <span id="processed_message_text">0</span> p/s
+            </p>
         </div>
     </div>
 
-    <div class="row">
-        <div class="large-3 medium-6 columns">
-            <div class="panel">
-                <h5>Live Stats</h5>
-                <p>
-                    Messages <span id="global_message_rates_graph"></span> <span id="global_message_rates_text">0</span> p/s
-                </p>
-                <p>
-                    Event Hits <span id="event_rates_graph"></span> <span id="event_rates_text">0</span> p/s
-                </p>
-                <p>
-                    Process Speed <span id="processed_message_graph"></span> <span id="processed_message_text">0</span> p/s
-                </p>
-            </div>
-        </div>
-
-        <div class="large-3 medium-6 columns">
-            <div class="panel">
-                <h5>Message Statistics</h5>
-                <p>
-                    Total messages: <strong>{{ stats.total_count|intcomma }}</strong><br/>
-                    Store Size: <strong>{{ stats.store_size|filesizeformat }}</strong><br/>
-                    Total Queries: <strong>{{ stats.total_queries|intcomma }}</strong><br/>
-                    Average Fetch Time: <strong>{{ stats.avg_fetch_time }}ms</strong><br/>
-                    <small>Updated <strong>{{ stats.time|naturaltime }}</strong></small>
-                </p>
-            </div>
-        </div>
-
-        <div class="large-6 medium-12 columns">
-            <div class="panel">
-                <h5>Recent Events</h5>
-            </div>
+    <div class="large-3 medium-6 columns">
+        <div class="panel">
+            <h5>Message Statistics</h5>
+            <p>
+                Total messages: <strong>{{ stats.total_count|intcomma }}</strong><br/>
+                Store Size: <strong>{{ stats.store_size|filesizeformat }}</strong><br/>
+                Total Queries: <strong>{{ stats.total_queries|intcomma }}</strong><br/>
+                Average Fetch Time: <strong>{{ stats.avg_fetch_time }}ms</strong><br/>
+                <small>Updated <strong>{{ stats.time|naturaltime }}</strong></small>
+            </p>
         </div>
     </div>
 
-    <div class="row">
-        <div class="small-12 columns">
-            <div id="example1"></div>
+    <div class="large-6 medium-12 columns">
+        <div class="panel">
+            <h5>Recent Events</h5>
         </div>
     </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div id="example1"></div>
+    </div>
+</div>
 {% endblock %}

@@ -7,7 +7,7 @@ mkdir %DIST_DIR%
 
 FOR /f %%d in ('dir /b /S src\ ^| grep setup.py') do (
     pushd %%~dpd
-    python setup.py build --build-base=%BUILD_DIR% sdist --formats=gztar
+    python setup.py build --build-base=%BUILD_DIR% bdist_wheel
     cp dist\* %DIST_DIR% -f
     rm -r -f dist
     python setup.py clean
@@ -18,7 +18,7 @@ FOR /f %%d in ('dir /b /S src\ ^| grep setup.py') do (
 rm -r -f .build
 
 pushd %DIST_DIR%
-for %%f in (*.tar.gz) DO pip install %%f --download-cache="C:\Users\tom\.pypi_cache" --find-links=%DIST_DIR% --upgrade
+for %%f in (*.whl) DO pip install %%f --download-cache="C:\Users\tom\.pypi_cache" --find-links=%DIST_DIR% --upgrade
 popd
 
 :rm -r -f %DIST_DIR%

@@ -4,71 +4,71 @@
 {% load static %}
 
 {% block extra_css %}
-    <link type="text/css" media="screen" rel="stylesheet" href="{% static "css/responsive-tables.css" %}"/>
+<link type="text/css" media="screen" rel="stylesheet" href="{% static "css/responsive-tables.css" %}"/>
 {% endblock %}
 
 {% block tail_includes %}
-    <script src="{% static "js/responsive-tables.js" %}"></script>
-    <script src="{% static "apps/formats/js/test_format.js" %}"></script>
+<script src="{% static "js/responsive-tables.js" %}"></script>
+<script src="{% static "apps/formats/js/test_format.js" %}"></script>
 {% endblock %}
 
 {% block format_content %}
 
-    <div class="row">
-        <div class="small-12 columns">
-            <ul class="breadcrumbs">
-              <li><a href="{% url "formats:edit" format.id %}">{{ format.name }}</a></li>
-              {% if field %}
-                <li><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a> </li>
-              {% else %}
-                <li class="current">Test Data</li>
-              {% endif %}
-            </ul>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="breadcrumbs">
+            <li><a href="{% url "formats:edit" format.id %}">{{ format.name }}</a></li>
+            {% if field %}
+            <li><a href="{% url "formats:modify_field" format.id field.id %}">{{ field.name }}</a> </li>
+            {% else %}
+            <li class="current">Test Data</li>
+            {% endif %}
+        </ul>
     </div>
+</div>
 
-    <div class="row">
-        <div class="small-12 columns">
-            {% crispy form %}
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        {% crispy form %}
     </div>
+</div>
 
-    <div class="row">
-        {% if split_data %}
-        <div class="large-6 columns">
-            <h5>Splitter results</h5>
-            <table class="responsive" style="max-width: 100%">
-                {% for item in split_data %}
-                    <tr>
-                        <th>{{ forloop.counter0 }}</th>
-                        <td>{{ item }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
-
-        {% if extracted_data %}
-        <div class="large-6 columns">
-            <h5>Extracted data <small>Took {{ extraction_speed|floatformat }}ms</small></h5>
-            <table class="responsive">
-                {% for key, sequence in extracted_data.items %}
-                    <tr>
-                        <th>{{ key }}</th>
-                        <td>
-                            <ol>
-                                {% for item in sequence|slice:":-1" %}
-                                    <li><pre>{{ item|pprint }}</pre></li>
-                                {% endfor %}
-                            </ol>
-                            {% localtime off %}
-                            Value: {{ sequence|last }}
-                            {% endlocaltime  %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
+<div class="row">
+    {% if split_data %}
+    <div class="large-6 columns">
+        <h5>Splitter results</h5>
+        <table class="responsive" style="max-width: 100%">
+            {% for item in split_data %}
+            <tr>
+                <th>{{ forloop.counter0 }}</th>
+                <td>{{ item }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
+    {% endif %}
+
+    {% if extracted_data %}
+    <div class="large-6 columns">
+        <h5>Extracted data <small>Took {{ extraction_speed|floatformat }}ms</small></h5>
+        <table class="responsive">
+            {% for key, sequence in extracted_data.items %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>
+                    <ol>
+                        {% for item in sequence|slice:":-1" %}
+                        <li><pre>{{ item|pprint }}</pre></li>
+                        {% endfor %}
+                    </ol>
+                    {% localtime off %}
+                    Value: {{ sequence|last }}
+                    {% endlocaltime  %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

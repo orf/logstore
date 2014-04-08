@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-setup(name="logstore.thrift_protocol",
+setup(name="logstore.thrift-protocol",
       version="0.1",
       description="",
       author="Tom Forbes",

@@ -2,14 +2,19 @@ from thrift.protocol import TBinaryProtocol
 from twisted.application import internet, service
 from twisted.internet.endpoints import clientFromString
 from twisted.internet import reactor
+from autobahn.wamp.router import RouterFactory
+from autobahn.twisted.wamp import RouterSessionFactory
+from autobahn.twisted.websocket import WampWebSocketServerFactory
 
 from .services.frontend.frontend import FrontendConnector
 from .services.daemon.factory import AuthenticatingThriftServerFactory
 from .services.internal.factory import InternalServiceFactory
 from .services.queue.factory import RabbitMQConnectionFactory, rabbitmq_reconnector
-from .services.live_update.factory import LiveUpdateFactory
+from .services.live_update.component import LiveUpdateComponent
 from .services.syslog.factory import SysLogFactory
 from .services.stats.stats import Stats
+
+
 
 
 def make_daemon_server_factory(frontend, queue, ws, stats):
@@ -17,11 +22,19 @@ def make_daemon_server_factory(frontend, queue, ws, stats):
                                              frontend=frontend, queue=queue, websockets=ws, stats=stats)
 
 
-def make_internal_server_factory(ws_factory, daemon_service_factory, queue_factory, stats):
+def make_internal_server_factory(ws, daemon_service_factory, queue_factory, stats):
     return InternalServiceFactory(None, TBinaryProtocol.TBinaryProtocolFactory(),
-                                  websocket_factory=ws_factory,
+                                  websocket_component=ws,
                                   daemon_service_factory=daemon_service_factory,
                                   queue_factory=queue_factory, stats=stats)
+
+
+def make_websocket_factory(stats):
+    session_factory = RouterSessionFactory(RouterFactory())
+    component = LiveUpdateComponent(stats)
+    session_factory.add(component)
+    factory = WampWebSocketServerFactory(session_factory, debug=True)
+    return component, factory
 
 
 def make_service(config):
@@ -29,10 +42,10 @@ def make_service(config):
     frontend = FrontendConnector(config["web_addr"])
     stats = Stats()
 
-    ws_factory = LiveUpdateFactory("ws://localhost:6062", stats=stats)
+    ws_component, ws_factory = make_websocket_factory(stats)
     conductor_service = service.MultiService()
-    daemon_service_factory = make_daemon_server_factory(frontend, queue_factory, ws_factory, stats)
-    internal_service_factory = make_internal_server_factory(ws_factory, daemon_service_factory, queue_factory, stats)
+    daemon_service_factory = make_daemon_server_factory(frontend, queue_factory, ws_component, stats)
+    internal_service_factory = make_internal_server_factory(ws_component, daemon_service_factory, queue_factory, stats)
     syslog_factory = SysLogFactory(frontend, queue_factory, stats)
 
     #internet.UDPClient("192.168.137.79", 8125, graphite).setServiceParent(conductor_service)

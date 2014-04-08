@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="row">
-        <div class="small-12 columns">
-            <h3>Alert: {{ alert.name }}</h3>
-            <hr/>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <h3>Alert: {{ alert.name }}</h3>
+        <hr/>
     </div>
+</div>
 
-    <div class="row">
-        <div class="small-12 columns">
-            {% block alert_content %}{% endblock %}
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        {% block alert_content %}{% endblock %}
     </div>
+</div>
 {% endblock %}

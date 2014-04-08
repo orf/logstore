@@ -1,74 +1,74 @@
 {% extends "alerts_base.html" %}
 
 {% block tail_includes %}
-    <script>
-        $(document).ready(function(){
-            $(".delete_link").click(function(){
-                $(this).parent("form").submit();
-            })
+<script>
+    $(document).ready(function() {
+        $(".delete_link").click(function() {
+            $(this).parent("form").submit();
         });
-    </script>
+    });
+</script>
 {% endblock %}
 
 {% block alert_content %}
 
-    <div class="row">
-        <div class="medium-6 columns">
-            <h5>Conditions</h5>
-            <table>
-                <thead>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th></th>
-                </thead>
-                <tbody>
-                    {% for condition in alert.conditions.all %}
-                        <tr>
-                            <td>{{ condition.name }}</td>
-                            <td>{{ condition.description }}</td>
-                            <td>
-                                <form method="POST" action="{% url "alerts:delete_condition" alert.id condition.id %}">
-                                    {% csrf_token %}
-                                    <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="row">
+    <div class="medium-6 columns">
+        <h5>Conditions</h5>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </thead>
+            <tbody>
+                {% for condition in alert.conditions.all %}
+                <tr>
+                    <td>{{ condition.name }}</td>
+                    <td>{{ condition.description }}</td>
+                    <td>
+                        <form method="POST" action="{% url "alerts:delete_condition" alert.id condition.id %}">
+                            {% csrf_token %}
+                            <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-            <a class="button tiny" href="{% url "alerts:add_condition" alert.id "count" %}">Add count condition</a>
-            <a class="button tiny" href="{% url "alerts:add_condition" alert.id "trigger" %}">Add trigger condition</a>
-            <a class="button tiny" href="{% url "alerts:add_condition" alert.id "percentage" %}">Add percentage condition</a>
-        </div>
-
-        <div class="medium-6 columns">
-            <h5>Contacts</h5>
-            <table>
-                <thead>
-                    <th>Type</th>
-                    <th>Contact</th>
-                    <th></th>
-                </thead>
-                <tbody>
-                    {% for contact in alert.contacts.all %}
-                        <tr>
-                            <td>{{ contact.name }}</td>
-                            <td>{{ contact.contact }}</td>
-                            <td>
-                                <form method="POST" action="{% url "alerts:delete_contact" alert.id contact.id %}">
-                                    {% csrf_token %}
-                                    <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <a class="button tiny" href="{% url "alerts:add_contact" alert.id "email" %}">Add email</a>
-            <a class="button tiny" href="{% url "alerts:add_contact" alert.id "text" %}">Add text</a>
-            <a class="button tiny" href="{% url "alerts:add_contact" alert.id "push" %}">Add push</a>
-        </div>
+        <a class="button tiny" href="{% url "alerts:add_condition" alert.id "count" %}">Add count condition</a>
+        <a class="button tiny" href="{% url "alerts:add_condition" alert.id "trigger" %}">Add trigger condition</a>
+        <a class="button tiny" href="{% url "alerts:add_condition" alert.id "percentage" %}">Add percentage condition</a>
     </div>
+
+    <div class="medium-6 columns">
+        <h5>Contacts</h5>
+        <table>
+            <thead>
+                <th>Type</th>
+                <th>Contact</th>
+                <th></th>
+            </thead>
+            <tbody>
+                {% for contact in alert.contacts.all %}
+                <tr>
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.contact }}</td>
+                    <td>
+                        <form method="POST" action="{% url "alerts:delete_contact" alert.id contact.id %}">
+                            {% csrf_token %}
+                            <a href="#" class="delete_link"><i class="fi-x"></i> Delete</a>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a class="button tiny" href="{% url "alerts:add_contact" alert.id "email" %}">Add email</a>
+        <a class="button tiny" href="{% url "alerts:add_contact" alert.id "text" %}">Add text</a>
+        <a class="button tiny" href="{% url "alerts:add_contact" alert.id "push" %}">Add push</a>
+    </div>
+</div>
 {% endblock %}

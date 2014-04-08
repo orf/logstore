@@ -1,14 +1,16 @@
+from autobahn.wamp1.protocol import WampServerProtocol, exportRpc
+from autobahn.wamp.protocol import ApplicationSession
+from twisted.internet import defer
+from autobahn import wamp
 from collections import defaultdict
-import hashlib
-import json
 
-from autobahn.wamp1.protocol import WampServerFactory
+import json
+import hashlib
+
 from zope.interface import implements
 from twisted.web.iweb import IBodyProducer
 from twisted.internet import defer, reactor
 from twisted.web.client import Agent, HTTPConnectionPool, readBody, Headers
-
-from.protocol import LiveUpdateProtocol
 
 
 http_pool = HTTPConnectionPool(reactor)
@@ -34,18 +36,34 @@ class StringProducer(object):
         pass
 
 
-class LiveUpdateFactory(WampServerFactory):
-    protocol = LiveUpdateProtocol
-
-    def __init__(self, *args, **kwargs):
+class LiveUpdateComponent(ApplicationSession):
+    def __init__(self, stats):
+        self.watched_stats = []
         self.percolators = defaultdict(int)
         self.stat_watchers = defaultdict(int)
-        self.stats = kwargs.pop("stats")
-        WampServerFactory.__init__(self, *args, **kwargs)
+        self.stats = stats
         self.stats.global_watch(self.stat_watcher)
+        self.clients = []
+
+        ApplicationSession.__init__(self)
+
+    def onConnect(self):
+        self.join("realm1")
+
+    @defer.inlineCallbacks
+    def onJoin(self, details):
+        yield self.register(self.subscribe_to_query, "logbook.update.subscribe")
+
+    @defer.inlineCallbacks
+    def subscribe_to_query(self, query):
+        query_hash = yield self.add_live_update_query(query_string=query["query_string"],
+                                                      streams=query["stream"],
+                                                      servers=query["server"])
+        #self.registerForPubSub("logbook/live/%s" % self.query_hash, pubsub=self.SUBSCRIBE)
+        defer.returnValue(query_hash)
 
     def stat_watcher(self, name, value):
-        self.dispatch("logbook/stat/%s" % name, value)
+        self.publish("logbook.stat.%s" % name, value)
 
     @defer.inlineCallbacks
     def remove_client(self, query_hash):
@@ -93,7 +111,7 @@ class LiveUpdateFactory(WampServerFactory):
         defer.returnValue(query_hash if r else None)
 
     def get_query_hash(self, query, namespace):
-        return "%s:%s" % (namespace, hashlib.md5(query).hexdigest())
+        return "%s.%s" % (namespace, hashlib.md5(query).hexdigest())
 
     @defer.inlineCallbacks
     def create_percolator(self, query, percolate_id):
@@ -123,7 +141,7 @@ class LiveUpdateFactory(WampServerFactory):
     @defer.inlineCallbacks
     def got_percolator_hit(self, line, time, server_id, file_name, hash, search_id):
         if hash in self.percolators:
-            yield self.dispatch("logbook/live/%s" % hash,
+            yield self.publish("logbook.live.%s" % hash,
                                 {
                                     "_source": {
                                         "message": line,
@@ -133,3 +151,4 @@ class LiveUpdateFactory(WampServerFactory):
                                         "search_id": search_id
                                     }
                                 })
+

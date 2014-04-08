@@ -45,7 +45,7 @@ class QueueProcessCommand(BaseCommand):
         try:
             self.create_mappings()
         except Exception, e:
-            pass
+            print "Could not create mapping: %s" % e
 
         connection = pika.BlockingConnection()
         channel = connection.channel()
@@ -97,7 +97,7 @@ class QueueProcessCommand(BaseCommand):
 
                         "data": {
                             "type": "object",
-                            "read_time": {"type": "date"},
+                            "time": {"type": "date"},
                         },
 
                         "server_id": {

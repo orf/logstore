@@ -6,30 +6,35 @@ messages =
 
 
 $(document).ready ->
-  ab.connect("ws://localhost:6062",
-                gotWebSocketConnection,
-                (code, reason) -> console.log "Error connecting to WebSockets: " + reason
-              )
+  connection = new autobahn.Connection({
+    url:"ws://localhost:6062/",
+    realm: 'realm1'
+  })
+
+  connection.onopen = gotWebSocketConnection
+  connection.open()
 
 
 
 gotWebSocketConnection = (session) ->
   console.log "Subscribed"
+
   session.subscribe(
-    "logbook/stat/got_log_line"
-    (uri, event) -> updateSpeedGraph("global_message_rates", event)
-    (error, desc) -> console.log "Error: " + error + " Desc: " + desc
+    "logbook.stat.got_log_line",
+    (args) -> updateSpeedGraph("global_message_rates", args[0])
   )
+
   session.subscribe(
-    "logbook/stat/got_event_hit"
-    (uri, event) -> updateSpeedGraph("event_rates", event)
-    (error, desc) -> console.log "Error: " + error + " Desc: " + desc
+    "logbook.stat.got_event_hit",
+    (args) -> updateSpeedGraph("event_rates", args[0])
   )
+
   session.subscribe(
-    "logbook/stat/processed_message"
-    (uri, event) -> updateSpeedGraph("processed_message", event)
-    (error, desc) -> console.log "Error: " + error + " Desc: " + desc
+    "logbook.stat.processed_message",
+    (args) -> updateSpeedGraph("processed_message", args[0])
   )
+
+
 
 updateSpeedGraph = (name, message_rate) ->
   messages[name].push(message_rate)
