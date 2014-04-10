@@ -22,7 +22,7 @@ class ConductorServiceHandler(object):
                 {
                     "server_id": self.server_id,
                     "file_name": line.file_name,
-                    "read_time": line.read_time,
+                    "time": line.read_time,
                     "log_message": line.log_line
                 }
             )

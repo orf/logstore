@@ -26,7 +26,7 @@ class EventQuery(models.Model):
         names = self.event.files.values_list("name")
         if not names:
             return ""
-        return " OR ".join('(file_name:"%s")' % name for name in names) + postfix
+        return " OR ".join('(stream_name:"%s")' % name for name in names) + postfix
 
     def get_query(self):
         prefix = self.get_file_name_query(postfix=" AND ")

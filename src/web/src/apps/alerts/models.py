@@ -118,7 +118,7 @@ class AlertCondition(models.Model):
                 "bool": {
                     "must": [
                         {"query_string": {"query": qs}},
-                        {"range": {"read_time": {"lte": started, "gte": started - self.get_timespan()}}}
+                        {"range": {"data.time": {"lte": started, "gte": started - self.get_timespan()}}}
                     ]
                 }
             }

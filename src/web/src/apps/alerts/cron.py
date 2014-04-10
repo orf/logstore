@@ -20,7 +20,7 @@ def test_alerts():
     for alert in alerts:
         print " - Testing alert %s" % alert.name
 
-        for condition in alert.conditions.filter(next_trigger__lte=started).all():
+        for condition in alert.conditions.all():#.filter(next_trigger__lte=started).all():
             print "  - Testing condition for %s" % condition.name()
             triggered, trigger_value, current_value = condition.check_triggered(started, es)
             print trigger_value, current_value

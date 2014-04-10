@@ -66,14 +66,14 @@ class EditEventFilesView(SingleObjectMixin, FormView):
 
     def get_initial(self):
         return {
-            "files": ", ".join((f.name for f in self.object.files.all()))
+            "files": [(f.name for f in self.object.files.all())]
         }
 
     def form_valid(self, form):
         event_queries = list(self.object.queries.all())
         self.object.queries.all().delete()
 
-        files = set(x.strip() for x in form.cleaned_data["files"].split(","))
+        files = set(x.strip() for x in form.cleaned_data["files"])
 
         self.object.files.all().delete()
 

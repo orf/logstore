@@ -31,7 +31,7 @@ class SysLogProtocol(AuthenticatingMixin, LineReceiver):
             json.dumps({"data": {"severity": severity, "facility": facility},
                         "server_id": self.server_id,
                         "file_name": "syslog",
-                        "read_time": datetime.datetime.now().isoformat(),
+                        "time": datetime.datetime.now().isoformat(),
                         "log_message": line
                     })
         )

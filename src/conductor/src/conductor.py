@@ -33,7 +33,7 @@ def make_websocket_factory(stats):
     session_factory = RouterSessionFactory(RouterFactory())
     component = LiveUpdateComponent(stats)
     session_factory.add(component)
-    factory = WampWebSocketServerFactory(session_factory, debug=True)
+    factory = WampWebSocketServerFactory(session_factory, debug=False)
     return component, factory
 
 

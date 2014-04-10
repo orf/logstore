@@ -45,6 +45,8 @@ displaySearchResults = (results, inc_counter=false) ->
 
 
 current_search_request = null;
+current_search_subscription = null;
+current_search_hash = null;
 
 gotWebSocketConnection = (session) ->
   refresh_search_results = () ->
@@ -74,12 +76,17 @@ gotWebSocketConnection = (session) ->
     session.call "logbook.update.subscribe", [query]
         .then (result) ->
             console.log result
-            #if current_search_subscription != null
-            #    current_search_subscription.unsubscribe()
+            if current_search_subscription != null
+                session.unsubscribe(current_search_subscription)
+                session.call "logbook.update.unsubscribe", [current_search_hash]
             #current_search_subscription = result
+            current_search_hash = result
 
             # We have a successful RPC result, we should now subscribe to the returned channel ID
-            session.subscribe("logbook.live." + result, (args) -> displaySearchResults([args], true))
+            session.subscribe("logbook.live." + result, (args) -> displaySearchResults(args, true)).then(
+              (sub) -> current_search_subscription = sub
+              (err) -> console.log "Error subscribing"
+            )
 
   refresh_search_results()
   $(".chosen").on('change', (evt, params) -> refresh_search_results())

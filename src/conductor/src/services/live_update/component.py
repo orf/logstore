@@ -53,6 +53,7 @@ class LiveUpdateComponent(ApplicationSession):
     @defer.inlineCallbacks
     def onJoin(self, details):
         yield self.register(self.subscribe_to_query, "logbook.update.subscribe")
+        yield self.register(self.unregister_query, "logbook.update.unsubscribe")
 
     @defer.inlineCallbacks
     def subscribe_to_query(self, query):
@@ -66,7 +67,7 @@ class LiveUpdateComponent(ApplicationSession):
         self.publish("logbook.stat.%s" % name, value)
 
     @defer.inlineCallbacks
-    def remove_client(self, query_hash):
+    def unregister_query(self, query_hash):
         if query_hash in self.percolators:
             self.percolators[query_hash] -= 1
 
@@ -76,7 +77,7 @@ class LiveUpdateComponent(ApplicationSession):
                 # ToDo: Some kind of locking here
                 yield self.remove_percolator(query_hash)
                 print "Removed percolator %s" % query_hash
-
+        defer.returnValue("")
 
     @defer.inlineCallbacks
     def remove_percolator(self, query_hash):

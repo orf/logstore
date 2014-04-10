@@ -13,26 +13,30 @@ from ..servers.models import Server
 es = Elasticsearch(settings.ELASTICSEARCH_URL)
 
 
-class GetLogFileNamesView(View):
-    def get(self, *args, **kwargs):
-        results = es.search("logs",
-                            "line",
-                            {
-                                "query": {
-                                    "match_all": {}
-                                },
-                                "facets": {
-                                    "stream_names": {
-                                        "terms": {
-                                            "field": "stream_name"
-                                        }
+def get_log_files():
+    results = es.search("logs",
+                        "line",
+                        {
+                            "query": {
+                                "match_all": {}
+                            },
+                            "facets": {
+                                "stream_names": {
+                                    "terms": {
+                                        "field": "stream_name"
                                     }
                                 }
-                            },
-                            size=0)
-        return HttpResponse(json.dumps(
-            [x["term"] for x in results["facets"]["stream_names"]["terms"]]
-        ), status=200, content_type="text/json")
+                            }
+                        },
+                        size=0)
+
+    return [x["term"] for x in results["facets"]["stream_names"]["terms"]]
+
+
+class GetLogFileNamesView(View):
+    def get(self, *args, **kwargs):
+
+        return HttpResponse(json.dumps(get_log_files()), status=200, content_type="text/json")
 
 
 class SearchLogsView(View):

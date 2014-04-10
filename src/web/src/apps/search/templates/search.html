@@ -20,9 +20,6 @@
 {% verbatim %}
 <script type="text/template" id="log_template">
         <p class="log_entry">
-            <!--<span class="time_info">
-                {{= moment(it.item._source.time).format("D/M/YY")}} {{= moment(it.item._source.read_time).format("HH:mm:ss")}}
-            </span>-->
             <span class="file_info">{{= it.item._source.stream_name }}</span>
             <span class="server_info">{{= it.getServerName(it.item._source.server_id) }}</span>
             <span>{{= it.item._source.message}}</span>

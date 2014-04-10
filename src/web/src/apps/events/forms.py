@@ -1,6 +1,8 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, Submit, ButtonHolder
+from crispy_forms_foundation.layout import Row, Column, Fieldset, Layout, HTML, Submit, ButtonHolder, Field
+
+from ..api.views import get_log_files
 
 from .models import Event, EventQuery
 
@@ -48,7 +50,8 @@ class AddEventQueryForm(forms.ModelForm):
 
 
 class EventFilesForm(forms.Form):
-    files = forms.CharField(max_length=1024)
+    files = forms.MultipleChoiceField(required=False)
+    #files = forms.CharField(max_length=2048)
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
@@ -56,11 +59,18 @@ class EventFilesForm(forms.Form):
         self.helper.layout = Layout(
             Fieldset(
                 'Edit Files',
-                "files"
+                Row(
+                    Column(
+                        Field("files", style="height: 100%")
+                    )
+                )
             ),
             ButtonHolder(Submit('submit', 'Submit', css_class="small"))
         )
 
         if "instance" in kwargs and kwargs["instance"] is not None:
             self.helper.layout.fields[0].legend = "Modify Transformation"
+
         super(EventFilesForm, self).__init__(*args, **kwargs)
+
+        self.fields["files"].choices = [(x, x) for x in get_log_files()]
