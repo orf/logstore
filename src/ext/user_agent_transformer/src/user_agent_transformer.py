@@ -3,7 +3,6 @@ from logstore.extractor.register import registry
 import httpagentparser
 
 
-@registry.add_transformer("user_agent", "User-Agent")
 class UserAgentTransformer(Transformer):
     def __init__(self, args):
         self.args = args
@@ -17,3 +16,5 @@ class UserAgentTransformer(Transformer):
         returner = {"raw": value}
         returner.update(parsed)
         return returner, "raw"
+
+registry.add("transformer", "user_agent", UserAgentTransformer, display_name="User-Agent")

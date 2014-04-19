@@ -16,7 +16,6 @@ except IOError:
     lookup = None
 
 
-@registry.add_transformer("geoip", "GeoIP Lookup")
 class GeoIPLookup(Transformer):
     def __init__(self, args):
         self.args = args
@@ -29,6 +28,9 @@ class GeoIPLookup(Transformer):
         return {"ip": value, "country": country}, "ip"
 
 
-@registry.add_type("ip", "IP Address")
 class IPType(unicode):
     pass
+
+
+registry.add("type", "ip", IPType, display_name="IP Address")
+registry.add("transformer", "geoip", GeoIPLookup, display_name="GeoIP Lookup")

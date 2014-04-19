@@ -3,12 +3,10 @@ from dateutil import parser
 from datetime import datetime, date, time
 
 
-@registry.add_type("int", display_name="Integer")
 class Integer(int):
     pass
 
 
-@registry.add_type("string")
 class String(unicode):
     pass
 
@@ -21,16 +19,20 @@ def generic_datetime_type(value, type):
     return value
 
 
-@registry.add_type("datetime")
 def get_datetime(value):
     return generic_datetime_type(value, datetime)
 
 
-@registry.add_type("date")
 def get_date(value):
     return generic_datetime_type(value, date)
 
 
-@registry.add_type("time")
 def get_time(value):
     return generic_datetime_type(value, time)
+
+
+registry.add("type", "int", Integer, display_name="Integer")
+registry.add("type", "string", String)
+registry.add("type", "datetime", datetime)
+registry.add("type", "date", get_date)
+registry.add("type", "time", get_time)
