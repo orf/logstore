@@ -20,6 +20,7 @@ class Options(usage.Options):
          ["file", "f", None]
      ]
 
+local_tz = tzlocal()
 
 class StandardInputForwarder(basic.LineReceiver):
     implements(interfaces.IHalfCloseableProtocol)
@@ -70,7 +71,7 @@ class StandardInputForwarder(basic.LineReceiver):
         if line:
             self.queue.append(
                 LogLine(file_name=self.file_name,
-                        read_time=datetime.datetime.now(tz=tzlocal()).isoformat(),
+                        read_time=datetime.datetime.now(tz=local_tz).isoformat(),
                         log_line=line)
             )
 
@@ -113,12 +114,17 @@ class ConnectionFactory(TTwisted.ThriftClientFactory):
 
 @defer.inlineCallbacks
 def send_file(file_path, forwarder):
+    def outputter(chunk):
+        sys.stdout.write(".")
+        return chunk
+
     with open(file_path, "rb") as fd:
         file_producer = basic.FileSender()
         file_producer.disconnecting = False
+        file_producer.CHUNK_SIZE *= 20
 
         forwarder.makeConnection(file_producer)
-        yield file_producer.beginFileTransfer(fd, FileForwarder(forwarder))
+        yield file_producer.beginFileTransfer(fd, FileForwarder(forwarder), transform=outputter)
         forwarder.readConnectionLost()
 
 

@@ -33,6 +33,6 @@ def get_time(value):
 
 registry.add("type", "int", Integer, display_name="Integer")
 registry.add("type", "string", String)
-registry.add("type", "datetime", datetime)
+registry.add("type", "datetime", get_datetime)
 registry.add("type", "date", get_date)
 registry.add("type", "time", get_time)

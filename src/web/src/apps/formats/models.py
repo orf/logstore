@@ -16,7 +16,7 @@ def no_reserved_names_validator(value):
         raise ValidationError("%s is a reserved name, please choose another" % value)
 
 
-splitter_choices = registry.get_splitter_choices()
+splitter_choices = registry.get_choices("splitter")
 
 
 class Format(models.Model):
@@ -51,7 +51,7 @@ class FormatStream(models.Model):
 
 class Field(models.Model):
     name = models.CharField(max_length=100, validators=[no_spaces_validator, no_reserved_names_validator])
-    type = models.CharField(choices=registry.get_type_choices(), max_length=255)
+    type = models.CharField(choices=registry.get_choices("type"), max_length=255)
     source_template = models.CharField(max_length=255)
     format = models.ForeignKey(Format, related_name="fields")
 
@@ -73,9 +73,9 @@ class Field(models.Model):
 
 
 class Transform(models.Model):
-    type = models.CharField(choices=registry.get_transformer_choices(), max_length=255)
+    type = models.CharField(choices=registry.get_choices("transformer"), max_length=255)
     args = models.CharField(max_length=255, blank=True)
-    field = models.ForeignKey(Format, related_name="transformations")
+    field = models.ForeignKey(Field, related_name="transformations")
 
     class Meta:
         ordering = ("id",)
