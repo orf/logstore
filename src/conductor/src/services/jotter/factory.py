@@ -15,7 +15,6 @@ class AuthenticatingThriftServerFactory(TTwisted.ThriftServerFactory):
         self.clients = defaultdict(list)
         self.frontend = kwargs.pop("frontend")
         self.queue = kwargs.pop("queue")
-        self.websockets = kwargs.pop("websockets")
         self.stats = kwargs.pop("stats")
         TTwisted.ThriftServerFactory.__init__(self, *args, **kwargs)
 

@@ -1,7 +1,5 @@
-from autobahn.wamp1.protocol import WampServerProtocol, exportRpc
 from autobahn.wamp.protocol import ApplicationSession
-from twisted.internet import defer
-from autobahn import wamp
+from autobahn.twisted.wamp import FutureMixin
 from collections import defaultdict
 
 import json
@@ -36,7 +34,7 @@ class StringProducer(object):
         pass
 
 
-class LiveUpdateComponent(ApplicationSession):
+class LiveUpdateComponent(FutureMixin, ApplicationSession):
     def __init__(self, stats):
         self.watched_stats = []
         self.percolators = defaultdict(int)

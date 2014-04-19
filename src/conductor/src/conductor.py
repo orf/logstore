@@ -7,7 +7,7 @@ from autobahn.twisted.wamp import RouterSessionFactory
 from autobahn.twisted.websocket import WampWebSocketServerFactory
 
 from .services.frontend.frontend import FrontendConnector
-from .services.daemon.factory import AuthenticatingThriftServerFactory
+from .services.jotter.factory import AuthenticatingThriftServerFactory
 from .services.internal.factory import InternalServiceFactory
 from .services.queue.factory import RabbitMQConnectionFactory, rabbitmq_reconnector
 from .services.live_update.component import LiveUpdateComponent
@@ -17,16 +17,14 @@ from .services.stats.stats import Stats
 
 
 
-def make_daemon_server_factory(frontend, queue, ws, stats):
+def make_daemon_server_factory(frontend, queue, stats):
     return AuthenticatingThriftServerFactory(None, TBinaryProtocol.TBinaryProtocolFactory(),
-                                             frontend=frontend, queue=queue, websockets=ws, stats=stats)
+                                             frontend=frontend, queue=queue, stats=stats)
 
 
-def make_internal_server_factory(ws, daemon_service_factory, queue_factory, stats):
+def make_internal_server_factory(ws, stats):
     return InternalServiceFactory(None, TBinaryProtocol.TBinaryProtocolFactory(),
-                                  websocket_component=ws,
-                                  daemon_service_factory=daemon_service_factory,
-                                  queue_factory=queue_factory, stats=stats)
+                                  websocket_component=ws, stats=stats)
 
 
 def make_websocket_factory(stats):
@@ -44,8 +42,8 @@ def make_service(config):
 
     ws_component, ws_factory = make_websocket_factory(stats)
     conductor_service = service.MultiService()
-    daemon_service_factory = make_daemon_server_factory(frontend, queue_factory, ws_component, stats)
-    internal_service_factory = make_internal_server_factory(ws_component, daemon_service_factory, queue_factory, stats)
+    daemon_service_factory = make_daemon_server_factory(frontend, queue_factory, stats)
+    internal_service_factory = make_internal_server_factory(ws_component, stats)
     syslog_factory = SysLogFactory(frontend, queue_factory, stats)
 
     #internet.UDPClient("192.168.137.79", 8125, graphite).setServiceParent(conductor_service)
@@ -77,4 +75,3 @@ def run():
     service = make_service(options)
     service.startService()
     reactor.run()
-    print service
