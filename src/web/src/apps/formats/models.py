@@ -20,10 +20,10 @@ splitter_choices = registry.get_splitter_choices()
 
 
 class Format(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=255)
 
     splitter_type = models.CharField(choices=splitter_choices, default=splitter_choices[0][0], max_length=255)
-    splitter_args = models.CharField(max_length=250, null=True, blank=True)
+    splitter_args = models.CharField(max_length=255, null=True, blank=True)
 
     def create_format(self):
         return ExtractorFormat(
@@ -41,19 +41,19 @@ class Format(models.Model):
         return {"terms": {"stream_name": list(self.streams.values_list("name", flat=True))}}
 
     def get_splitter(self):
-        return registry.get_splitter_by_name(self.splitter_type)(self.splitter_args)
+        return registry.get_by_name("splitter", self.splitter_type)(self.splitter_args)
 
 
 class FormatStream(models.Model):
     name = models.CharField(max_length=250)
-    format = models.ForeignKey("formats.Format", related_name="streams")
+    format = models.ForeignKey(Format, related_name="streams")
 
 
 class Field(models.Model):
     name = models.CharField(max_length=100, validators=[no_spaces_validator, no_reserved_names_validator])
     type = models.CharField(choices=registry.get_type_choices(), max_length=255)
     source_template = models.CharField(max_length=255)
-    format = models.ForeignKey("formats.Format", related_name="fields")
+    format = models.ForeignKey(Format, related_name="fields")
 
     def get_field(self):
         return ExtractorField(
@@ -66,7 +66,7 @@ class Field(models.Model):
         )
 
     def get_field_type(self):
-        return registry.get_type_by_name(self.type)
+        return registry.get_by_name("type", self.type)
 
     def __unicode__(self):
         return "Field %s (%s) in %s" % (self.name, self.get_type_display(), self.format.name)
@@ -74,11 +74,11 @@ class Field(models.Model):
 
 class Transform(models.Model):
     type = models.CharField(choices=registry.get_transformer_choices(), max_length=255)
-    args = models.CharField(max_length=250, blank=True)
-    field = models.ForeignKey("formats.Field", related_name="transformations")
+    args = models.CharField(max_length=255, blank=True)
+    field = models.ForeignKey(Format, related_name="transformations")
 
     class Meta:
         ordering = ("id",)
 
     def get_transformer(self):
-        return registry.get_transformer_by_name(self.type)(self.args)
+        return registry.get_by_name("transformer", self.type)(self.args)

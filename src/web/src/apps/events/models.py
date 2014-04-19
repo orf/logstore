@@ -2,22 +2,22 @@ from django.db import models
 
 
 class Event(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=255)
     count = models.BigIntegerField(default=0)
 
 
 class EventFile(models.Model):
-    name = models.CharField(max_length=250)
-    event = models.ForeignKey("events.Event", related_name="files")
+    name = models.CharField(max_length=255)
+    event = models.ForeignKey(Event, related_name="files")
 
 
 class EventQuery(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=255)
     weight = models.IntegerField()
     query = models.CharField(max_length=1024)
     percolate_hash = models.TextField(default="")
 
-    event = models.ForeignKey("events.Event", related_name="queries")
+    event = models.ForeignKey(Event, related_name="queries")
 
     def __unicode__(self):
         return '%s  Weight: %s  Query: "%s"' % (self.name, self.weight, self.query)

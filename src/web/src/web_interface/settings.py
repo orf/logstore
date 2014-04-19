@@ -69,7 +69,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'template_timings_panel',
     'crispy_forms',
-    'crispy_forms_foundation'
+    'crispy_forms_foundation',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -150,7 +151,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CRISPY_TEMPLATE_PACK = 'foundation'
+CRISPY_TEMPLATE_PACK = 'foundation-5'
 
 ACTIVE_URL_CACHE = False
 

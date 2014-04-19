@@ -27,7 +27,7 @@ class Alert(models.Model):
 
 class AlertContact(models.Model):
     name = None
-    alert = models.ForeignKey("alerts.Alert", related_name="contacts")
+    alert = models.ForeignKey(Alert, related_name="contacts")
     objects = SelectSubclassManager()
 
     def notify(self, current_value, triggered_condition):
@@ -70,7 +70,7 @@ class PushBulletContact(AlertContact):
 
 
 class AlertCondition(models.Model):
-    alert = models.ForeignKey("alerts.Alert", related_name="conditions")
+    alert = models.ForeignKey(Alert, related_name="conditions")
     event_query = models.ForeignKey("events.EventQuery", related_name="alerts", null=True)
     format_field = models.ForeignKey("formats.Field", related_name="alerts", null=True)
     time_value = models.PositiveIntegerField()

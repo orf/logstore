@@ -18,7 +18,7 @@ class Arguments(object):
 def parse_arguments(args):
     returner = OrderedDict()
 
-    for i, arg in enumerate(shlex.split(args)):
+    for i, arg in enumerate(shlex.split(args or "")):
         returner[i] = arg
         match = re.match('(?P<name>[a-zA-Z]+):(?P<value>.*)', arg)
         if match:

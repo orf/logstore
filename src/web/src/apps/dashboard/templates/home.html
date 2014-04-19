@@ -22,22 +22,39 @@
 </div>
 
 <div class="row">
-    <div class="large-3 medium-6 columns">
+    <div class="medium-4 columns">
         <div class="panel">
             <h5>Live Stats</h5>
-            <p>
-                Messages <span id="global_message_rates_graph"></span> <span id="global_message_rates_text">0</span> p/s
-            </p>
-            <p>
-                Event Hits <span id="event_rates_graph"></span> <span id="event_rates_text">0</span> p/s
-            </p>
-            <p>
-                Process Speed <span id="processed_message_graph"></span> <span id="processed_message_text">0</span> p/s
-            </p>
+            <div class="row">
+                <div class="small-4 columns">
+                    Incoming messages
+                </div>
+                <div class="small-8 columns">
+                    <span id="global_message_rates_graph"></span> <span id="global_message_rates_text">0</span> p/s
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="small-4 columns">
+                    Processed messages
+                </div>
+                <div class="small-8 columns">
+                    <span id="processed_message_graph"></span> <span id="processed_message_text">0</span> p/s
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="small-4 columns">
+                    Events
+                </div>
+                <div class="small-8 columns">
+                    <span id="event_rates_graph"></span> <span id="event_rates_text">0</span> p/s
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="large-3 medium-6 columns">
+    <div class="medium-4 columns end">
         <div class="panel">
             <h5>Message Statistics</h5>
             <p>
@@ -47,12 +64,6 @@
                 Average Fetch Time: <strong>{{ stats.avg_fetch_time }}ms</strong><br/>
                 <small>Updated <strong>{{ stats.time|naturaltime }}</strong></small>
             </p>
-        </div>
-    </div>
-
-    <div class="large-6 medium-12 columns">
-        <div class="panel">
-            <h5>Recent Events</h5>
         </div>
     </div>
 </div>

@@ -1,4 +1,3 @@
-
 struct Event {
     1: i32 id,
     2: string name,
@@ -25,6 +24,7 @@ service InternalConductorService {
 
     // Notifies the conductor when a new Event has been added
     string create_event(1:Event event),
+
     // Notifies the conductor when an Event has been removed
     bool remove_event(1:string percolate_id),
 
