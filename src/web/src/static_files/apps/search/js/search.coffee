@@ -4,7 +4,7 @@ template_func = null;
 $(document).ready ->
   template = $("#log_template").text()
   template_func = doT.template(template)
-  $(".chosen").chosen()
+  $(".chosen").chosen({width:"100%"})
 
       #$("html, body").animate({scrollTop: $(document).height()}, 0)
 

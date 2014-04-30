@@ -15,6 +15,8 @@ from .services.syslog.factory import SysLogFactory
 from .services.stats.stats import Stats
 
 
+from twisted.internet import protocol
+
 
 
 def make_daemon_server_factory(frontend, queue, stats):

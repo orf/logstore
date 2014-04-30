@@ -8,7 +8,9 @@
     var connection, template;
     template = $("#log_template").text();
     template_func = doT.template(template);
-    $(".chosen").chosen();
+    $(".chosen").chosen({
+      width: "100%"
+    });
     connection = new autobahn.Connection({
       url: "ws://localhost:6062/",
       realm: 'realm1'
