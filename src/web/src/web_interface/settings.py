@@ -81,6 +81,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
+    'utils.RequireLoginMiddleware.RequireLoginMiddleware'
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
@@ -98,6 +99,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 INTERNAL_IPS = ('127.0.0.1', '192.168.137.1')
 INTERCEPT_REDIRECTS = True
+
+LOGIN_REDIRECT_URL = "/"
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.versions.VersionsPanel',

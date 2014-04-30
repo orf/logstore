@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     url(r'^search/', include('apps.search.urls', namespace='search')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('apps.api.urls', namespace="api")),
+    url(r'^login/', 'django.contrib.auth.views.login', {'template_name':'login.html',}, name="login"),
+    url(r'^logout/', 'django.contrib.auth.views.logout_then_login', {'login_url': '/login/'}, name='logout'),
 
     url(r'^djangojs/', include('djangojs.urls')),
 )

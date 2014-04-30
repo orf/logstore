@@ -23,13 +23,14 @@
                 </ul>
 
                 <section class="top-bar-section">
+                    {% if request.user.is_authenticated %}
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
                         <li class="has-dropdown">
-                            <a href="#">Logged in as [USER]</a>
+                            <a href="#">Logged in as {{ request.user.username }}</a>
                             <ul class="dropdown">
-                                <li><a href="#">Some Link</a></li>
+                                <li><a href="{% url "logout" %}">Logout</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -41,6 +42,7 @@
                         <li><a href="{% url "events:view" %}">Events</a></li>
                         <li><a href="{% url "alerts:view" %}">Alerts</a></li>
                     </ul>
+                    {% endif %}
                 </section>
             </nav>
         </div>
