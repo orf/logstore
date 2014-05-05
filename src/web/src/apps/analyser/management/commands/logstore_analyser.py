@@ -15,10 +15,10 @@ class Command(QueueProcessCommand):
         super(Command, self).__init__()
 
     def got_message(self, message):
-        if "read_time" not in message:
+        if "time" not in message:
             return
 
-        read_time = parse(message["read_time"])
+        read_time = parse(message["time"])
 
         data = message.get("data", {})
         data.update({"time": read_time})

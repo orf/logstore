@@ -14,6 +14,9 @@ setup(name="logstore.web",
               "logstore_manage = logstore.web.logstore_manage:run"
           ]
       },
+      extra_require = {
+          'postgres': ["psycopg2"],
+      },
       install_requires=[
           "logstore.extractor",
           "logstore.thrift-protocol",
@@ -31,7 +34,6 @@ setup(name="logstore.web",
           "django-kronos",
           "pushbullet.py",
           "elasticsearch",
-          "psycopg2",
           "ipaddr",
           "thrift",
           "pytz"])
