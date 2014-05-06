@@ -1,0 +1,8 @@
+recursive-include src/static_files *
+recursive-include src/templates *
+recursive-include src/bower_components *
+
+
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

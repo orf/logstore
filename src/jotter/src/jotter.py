@@ -15,9 +15,9 @@ from dateutil.tz import tzlocal
 
 class Options(usage.Options):
      optParameters = [
-         ["master", "m", None],
-         ["name", "n", None],
-         ["file", "f", None]
+         ["conductor", "m", "tcp:localhost:6060", "The location of the conductor"],
+         ["stream", "n", None, "The name of the stream to send data to. Defaults to file name, must be given if using standard input."],
+         ["file", "f", None, "The name of the file to import"]
      ]
 
 local_tz = tzlocal()
@@ -138,11 +138,11 @@ def main():
         print "%s: Try --help for usage details" % sys.argv[0]
         sys.exit(1)
 
-    if options["file"] and not options["name"]:
+    if options["file"] and not options["stream"]:
         import os
-        options["name"] = os.path.basename(options["file"])
+        options["stream"] = os.path.basename(options["file"])
 
-    endpoint = endpoints.clientFromString(reactor, options["master"])
+    endpoint = endpoints.clientFromString(reactor, options["conductor"])
     forwarder = StandardInputForwarder(
         endpoint.connect(
             ConnectionFactory(

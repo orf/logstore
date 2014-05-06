@@ -26,7 +26,7 @@ class FormatMixin(ContextMixin):
 
 class FormatsListView(CreateView):
     form_class = AddFormatForm
-    template_name = "list_formats.html"
+    template_name = "formats/list_formats.html"
     success_url = reverse_lazy("formats:view")
 
     def get_context_data(self, **kwargs):
@@ -44,7 +44,7 @@ class FormatDeleteView(DeleteView):
 class FormatDetailView(UpdateView):
     form_class = ModifyFormatForm
     model = Format
-    template_name = "edit_format.html"
+    template_name = "formats/edit_format.html"
 
     def get_initial(self):
         return {
@@ -70,7 +70,7 @@ class FormatDetailView(UpdateView):
 class FormatTestDataView(SingleObjectMixin, FormView):
     form_class = TestFormatDataForm
     model = Format
-    template_name = "test_format.html"
+    template_name = "formats/test_format.html"
 
     def get_form_kwargs(self):
         kwargs = super(FormatTestDataView, self).get_form_kwargs()
@@ -98,7 +98,7 @@ class FormatTestDataView(SingleObjectMixin, FormView):
 
 class AddFieldView(FormatMixin, UpdateView):
     form_class = FieldForm
-    template_name = "edit_field.html"
+    template_name = "formats/edit_field.html"
 
     def get_object(self, queryset=None):
         try:
@@ -118,7 +118,7 @@ class AddFieldView(FormatMixin, UpdateView):
 
 class AddTransformationView(FormatMixin, UpdateView):
     form_class = TransformForm
-    template_name = "edit_transformation.html"
+    template_name = "formats/edit_transformation.html"
 
     def get_object(self, queryset=None):
         try:
@@ -139,7 +139,7 @@ class AddTransformationView(FormatMixin, UpdateView):
 
 class EditFormatStreamsView(FormatMixin, SingleObjectMixin, FormView):
     form_class = FormatStreamsForm
-    template_name = "edit_format_streams.html"
+    template_name = "formats/edit_format_streams.html"
     model = Format
     pk_url_kwarg = "format_id"
 

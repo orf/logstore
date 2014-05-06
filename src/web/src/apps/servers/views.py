@@ -7,7 +7,7 @@ from .forms import AddServerForm
 
 class ServersView(CreateView):
     form_class = AddServerForm
-    template_name = "servers.html"
+    template_name = "servers/servers.html"
     success_url = reverse_lazy("servers:view")
 
     def get_context_data(self, **kwargs):

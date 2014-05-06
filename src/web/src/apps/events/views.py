@@ -8,7 +8,7 @@ from .forms import AddEventForm, AddEventQueryForm, EventFilesForm
 
 
 class EventsView(CreateView):
-    template_name = "events.html"
+    template_name = "events/events.html"
     success_url = reverse_lazy("events:view")
     form_class = AddEventForm
 
@@ -20,7 +20,7 @@ class EventsView(CreateView):
 
 class EditEventView(CreateView):
     model = EventQuery
-    template_name = "edit_event.html"
+    template_name = "events/edit_event.html"
     form_class = AddEventQueryForm
 
     def get_context_data(self, **kwargs):
@@ -56,7 +56,7 @@ class DeleteEventView(DeleteView):
 
 class EditEventFilesView(SingleObjectMixin, FormView):
     form_class = EventFilesForm
-    template_name = "edit_event_files.html"
+    template_name = "events/edit_event_files.html"
     model = Event
     pk_url_kwarg = "event_id"
 

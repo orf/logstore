@@ -14,7 +14,7 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-sys.path.append(os.path.join(BASE_DIR, ".."))
+sys.path.append(BASE_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -37,8 +37,6 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-# Application definition
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -71,6 +69,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'crispy_forms_foundation',
     'django_extensions',
+    'gunicorn'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -122,24 +121,12 @@ ROOT_URLCONF = 'web_interface.urls'
 
 WSGI_APPLICATION = 'web_interface.wsgi.application'
 
-try:
-    import psycopg2
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'logstore',
-            'USER': 'logstore',
-            'PASSWORD': 'password'
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
     }
-except ImportError:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
-        }
-    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

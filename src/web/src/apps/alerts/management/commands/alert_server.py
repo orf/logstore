@@ -11,4 +11,4 @@ class Command(BaseCommand):
 
         while True:
             test_alerts()
-            time.sleep(30)
+            time.sleep(60)

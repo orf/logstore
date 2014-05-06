@@ -35,7 +35,7 @@ class EditAlertView(DetailView):
 
 
 class AddAlertCondition(AlertMixin, CreateView):
-    template_name = "add_alert_form_display.html"
+    template_name = "alerts/add_alert_form_display.html"
 
     def get_form_class(self):
         return {"count": AddAlertConditionBucketCountForm,
@@ -62,7 +62,7 @@ class DeleteAlertConditionView(DeleteView):
 
 
 class AddContactView(AlertMixin, CreateView):
-    template_name = "add_alert_form_display.html"
+    template_name = "alerts/add_alert_form_display.html"
 
     def get_form_class(self):
         return {

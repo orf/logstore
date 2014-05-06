@@ -1,0 +1,52 @@
+<h1 id="logstore-configuration-instructions">Logstore configuration instructions</h1>
+
+<h2 id="conductor">Conductor</h2>
+
+<p>Starting the conductor is simple: execute <code>twistd logstore-conductor</code> (on windows it may have to be <code>twistd.py</code>). This <br>
+assumes you are running RabbitMQ on port 5672 and the web interface can be reached at port 8000. Run <br>
+ <code>twistd logstore-conductor help</code> to see how to change them.</p>
+
+<h2 id="web">Web</h2>
+
+<p>Configure the initial settings by executing <code>logstore init</code>. This will create a <code>.logstore</code> directory inside your home <br>
+directory, and create a <code>web_settings.py</code> file. No configuration is needed to get started with Logstore.</p>
+
+<p>Before you run the web interface the database schema needs to be set up. This is handled automatically for you by <br>
+executing the following command: <code>logstore syncdb</code>. You will be asked to enter a username and password for the first <br>
+administrator account, ensure you create one and remember the credentials as you will need them to log in.</p>
+
+<p>If you are experimenting with Logstore then you can load some initial data like formats, alerts and events by executing <br>
+<code>logstore loaddata</code>.</p>
+
+<p>Once the database has been configured the web application can be started. If you are simply experimenting with Logstore <br>
+then Logstore can be run with a basic built in webserver. To start this run <code>logstore runserver --noreload</code> from the <br>
+command line, by default it serves on port 8000 so visit <a href="">http://localhost:8000/</a>. This can be customized, run <br>
+<code>logstore runserver --help</code> to view more options.</p>
+
+<p>If you are running this in production then the built in webserver will not perform well enough. On Linux the preferred <br>
+setup is to have a Nginx frontend webserver that proxies requests to several backend Gunicorn processes. Setting that <br>
+up is outside of the scope of this document, but logstore can be started with gunicorn using the <code>logstore run_gunicorn</code> <br>
+command.</p>
+
+<h3 id="download-the-geoip-database">Download the GeoIP database</h3>
+
+<p>By default logstore comes with an extension to geolocate IP addresses. You need to download the GeoIP database by <br>
+running <code>logstore runtask download_geoip</code>.</p>
+
+<h3 id="running-the-analyser">Running the analyser</h3>
+
+<p>The analyser can be started by executing <code>logstore analyser</code>. This will begin to pull messages from the queue and <br>
+index them according to your formats. <strong>Note:</strong> As of yet any changes made to formats after the analyser has been started <br>
+are not seen by the analyser. This will be fixed in the future, but please restart the analyser after any changes.</p>
+
+<h3 id="triggering-alerts">Triggering alerts</h3>
+
+<p>Alerts are checked every minute by a separate daemon which can be started by <code>logstore alert_server</code>. Execute this in <br>
+the background.</p>
+
+<h2 id="importing-data">Importing data</h2>
+
+<p>Data can be imported using the <code>jotter</code> command or via Syslog. To get started quickly the jotter package comes with a <br>
+<code>logstore_fake_data</code> command that can be used to generate fake Nginx log or ping log data. Ensure that the conductor, <br>
+web interface and analyser are running and then and import some data by executing <br>
+<code>logstore_fake_data nginx 10000 | jotter -n access_log</code>.</p>

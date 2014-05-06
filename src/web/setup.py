@@ -9,15 +9,19 @@ setup(name="logstore.web",
       package_dir = {'logstore.web': 'src'},
       namespace_packages =["logstore"],
       packages=["logstore.web"] + ["logstore.web." + p for p in find_packages("src")],
+      include_package_data=True,
+      zip_safe=False,
       entry_points={
           "console_scripts": [
-              "logstore_manage = logstore.web.logstore_manage:run"
+              "logstore = logstore.web.logan_runner:main"
+              #"logstore_manage = logstore.web.logstore_manage:run"
           ]
       },
-      extra_require = {
+      extras_require = {
           'postgres': ["psycopg2"],
       },
       install_requires=[
+          "logan",
           "logstore.extractor",
           "logstore.thrift-protocol",
           "logstore-geoip-transformer",
@@ -36,4 +40,5 @@ setup(name="logstore.web",
           "elasticsearch",
           "ipaddr",
           "thrift",
+          "gunicorn",
           "pytz"])

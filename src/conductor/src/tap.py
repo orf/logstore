@@ -22,8 +22,7 @@ def verify_addr(val):
 
 class Options(usage.Options):
     optParameters = [
-        ("web_addr", "w", None, "The web address the master is running on", verify_addr),
-        ("statsd_addr", "s", "udp:localhost:8125", "The "),
+        ("web_addr", "w", "http://127.0.0.1:8000", "The web address the master is running on", verify_addr),
         ("queue_addr", "q", "tcp:localhost:5672", "The location of the queue")
     ]
 

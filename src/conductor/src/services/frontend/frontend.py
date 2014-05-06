@@ -10,6 +10,8 @@ pool = HTTPConnectionPool(reactor, persistent=True)
 class FrontendConnector(object):
 
     def __init__(self, frontend_addr):
+        if frontend_addr.endswith("/"):
+            frontend_addr = frontend_addr[0:-1]
         self.frontend_addr = frontend_addr
         self.lock = defer.DeferredLock()
         self.api_path = "%s/api" % self.frontend_addr

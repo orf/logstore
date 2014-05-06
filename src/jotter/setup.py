@@ -11,9 +11,11 @@ setup(name="logstore.jotter",
       packages=["logstore.jotter"] + ["logstore.jotter." + p for p in find_packages("src")],
       install_requires=["logstore.thrift-protocol",
                         "twisted==13.2.0",
-                        "python-dateutil"],
+                        "python-dateutil",
+                        "fake-factory"],
       entry_points={
           "console_scripts": [
-              "jotter = logstore.jotter.jotter:main"
+              "jotter = logstore.jotter.jotter:main",
+              "logstore_fake_data = logstore.jotter.generate_random_data:main"
           ]
       })
