@@ -38,6 +38,10 @@ STATICFILES_DIRS = (
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+FIXTURE_DIRS = (
+    os.path.join(BASE_DIR, "fixtures")
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',

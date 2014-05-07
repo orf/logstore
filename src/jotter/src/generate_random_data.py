@@ -1,6 +1,5 @@
 from __future__ import division
 
-import time
 import random
 import sys
 from datetime import datetime
@@ -13,7 +12,7 @@ def random_ping_message():
     if random.randint(0, 100) > 95:
         return "Request timed out.\n"
     else:
-        return "Reply from %s: bytes=32 time=%sms TTL=60\n" % (random_ip(), random.randint(1, 100))
+        return "Reply from %s: bytes=32 time=%sms TTL=60" % (fake.ipv4(), random.randint(1, 100))
 
 
 def random_stauts_code():
@@ -55,19 +54,11 @@ def random_nginx_message(random_time=True):
     )
 
 
-def random_ip():
-    return "%s.%s.%s.%s" % (random.randint(1, 255),
-                            random.randint(1, 255),
-                            random.randint(1, 255),
-                            random.randint(1, 255))
-
-
 def main():
     if sys.argv[1] == "ping":
-        generator = random_ip
+        generator = random_ping_message
     else:
         generator = random_nginx_message
-
 
     for i in xrange(int(sys.argv[2])):
         print generator()

@@ -16,7 +16,7 @@ from dateutil.tz import tzlocal
 class Options(usage.Options):
      optParameters = [
          ["conductor", "m", "tcp:localhost:6060", "The location of the conductor"],
-         ["stream", "n", None, "The name of the stream to send data to. Defaults to file name, must be given if using standard input."],
+         ["stream", "s", None, "The name of the stream to send data to. Defaults to file name, must be given if using standard input."],
          ["file", "f", None, "The name of the file to import"]
      ]
 
@@ -147,7 +147,7 @@ def main():
         endpoint.connect(
             ConnectionFactory(
                 ConductorService.Client, TBinaryProtocol.TBinaryProtocolFactory())
-            ), options["name"]
+            ), options["stream"]
         )
 
     if options["file"]:

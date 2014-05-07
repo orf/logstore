@@ -45,6 +45,8 @@ class Command(QueueProcessCommand):
             "failed_formats": [],
             "data": data
         }
+        #self.send_to_conductor("increment_stat", "processed_message")
+        #return# self.stdout.write(".", ending="")
 
         result = self.es.index(index="logs", doc_type="line", body=doc)
         self.send_to_conductor("increment_stat", "processed_message")

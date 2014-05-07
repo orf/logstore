@@ -19,4 +19,4 @@ class HttpRequestTransformer(Transformer):
         return {"raw": value, "path": path, "command": command, "version": float(version_number)}, "raw"
 
 
-registry.add("transformer", "http_request", HttpRequestTransformer, "HTTP Request")
+registry.add("transformer", "http_request", HttpRequestTransformer, "Parse HTTP Request")

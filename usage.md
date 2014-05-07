@@ -5,6 +5,9 @@ Starting the conductor is simple: execute `twistd logstore-conductor` (on window
 assumes you are running RabbitMQ on port 5672 and the web interface can be reached at port 8000. Run
  `twistd logstore-conductor help` to see how to change them.
 
+Twisted also exposes a lot of other configuration options that can be used to configure the services environment, such
+as the user account to run under and the logging settings, run
+`twistd --help` for more information.
 
 ## Web
 Configure the initial settings by executing `logstore init`. This will create a `.logstore` directory inside your home
@@ -46,3 +49,8 @@ Data can be imported using the `jotter` command or via Syslog. To get started qu
 `logstore_fake_data` command that can be used to generate fake Nginx log or ping log data. Ensure that the conductor,
 web interface and analyser are running and then and import some data by executing
 `logstore_fake_data nginx 10000 | jotter -n access_log`.
+
+You can import data without defining a format, but searches will be limited to fulltext ones only. Logstore comes with
+some example formats, events and alerts that you can add by running `logstore loaddata example.json` (`example.json`
+can be found in the root project directory). **Before you execute the loaddata command ensure that both the conductor
+and the Elasticsearch server are running.**

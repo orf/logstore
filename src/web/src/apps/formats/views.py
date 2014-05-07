@@ -137,22 +137,6 @@ class AddTransformationView(FormatMixin, UpdateView):
                                                           self.object.field_id])
 
 
-class EditFormatStreamsView(FormatMixin, SingleObjectMixin, FormView):
-    form_class = FormatStreamsForm
-    template_name = "formats/edit_format_streams.html"
-    model = Format
-    pk_url_kwarg = "format_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(EditFormatStreamsView, self).dispatch(request, *args, **kwargs)
-
-
-
-    def get_success_url(self):
-        return reverse_lazy("formats:edit", args=[self.get_object().id])
-
-
 class DeleteTransformView(DeleteView):
     model = Transform
     http_method_names = ["post"]

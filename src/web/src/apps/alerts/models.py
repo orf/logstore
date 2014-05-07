@@ -150,7 +150,7 @@ class EventTriggeredCondition(AlertCondition):
 
 class StatisticalValueCondition(AlertCondition):
     statistic = models.CharField(choices=StatisticalChoice, max_length=255)
-    value = models.IntegerField()
+    value = models.FloatField()
 
     def get_trigger_value(self, started, es):
         return self.value
